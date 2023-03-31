@@ -59,7 +59,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/pkg/errors v0.9.1
-	k8s.io/kubectl v0.26.0
+	k8s.io/kubectl v0.26.3
 )
 
 require (
