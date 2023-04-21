@@ -63,10 +63,10 @@ compile-clean:
 
 # Map
 load-map-ecnet_dns_aaaa:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
 
 load-map-ecnet_dns_eips:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
 
 load-map-ecnet_sess_dest:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_sess_dest ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_sess_dest type lru_hash key 8 value 8 entries 65535 name ecnet_sess_dest
@@ -79,8 +79,8 @@ load-map-ecnet_sock_pair:
 
 clean-maps:
 	sudo rm -f \
-		$(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
-		$(PROG_MOUNT_PATH)/ecnet_dns_eips \
+		$(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_aaaa \
+		$(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_eips \
 		$(PROG_MOUNT_PATH)/ecnet_sess_dest \
 		$(PROG_MOUNT_PATH)/ecnet_pair_dest \
 		$(PROG_MOUNT_PATH)/ecnet_sock_pair \
