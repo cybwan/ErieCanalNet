@@ -70,6 +70,7 @@ struct bpf_elf_map __section("maps") ecnet_dns_aaaa = {
     .size_key = sizeof(struct dns_query),
     .size_value = sizeof(struct a_record),
     .max_elem = 65535,
+    .pinning = 2, // PIN_GLOBAL_NS
 };
 
 struct bpf_elf_map __section("maps") ecnet_dns_eips = {
@@ -77,6 +78,7 @@ struct bpf_elf_map __section("maps") ecnet_dns_eips = {
     .size_key = sizeof(__u32),
     .size_value = sizeof(__u32),
     .max_elem = 65535,
+    .pinning = 2, // PIN_GLOBAL_NS
 };
 
 struct bpf_elf_map __section("maps") ecnet_sess_dest = {
