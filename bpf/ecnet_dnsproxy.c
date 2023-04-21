@@ -31,7 +31,7 @@ static inline void copy_to_pkt_buf(struct xdp_md *ctx, void *dst, void *src,
 #define memcpy(dest, src, n) __builtin_memcpy((dest), (src), (n))
 #endif
 
-__section("prog") int ecnet_dns_proxy(struct xdp_md *ctx)
+__section("xdp") int ecnet_dns_proxy(struct xdp_md *ctx)
 {
 #ifdef DEBUG
     __u64 start = bpf_ktime_get_ns();

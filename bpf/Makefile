@@ -48,7 +48,8 @@ $(BPF_FS):
 	mountpoint -q $@ || mount -t bpf bpf $@
 
 init-bpffs:
-	mountpoint -q ${BPF_FS} || mount -t bpf bpf ${BPF_FS}
+	mount -t bpf bpf ${BPF_FS}
+	mkdir -p $(PROG_MOUNT_PATH)/xdp/globals
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(MACROS) -c $< -o $@
@@ -63,10 +64,10 @@ compile-clean:
 
 # Map
 load-map-ecnet_dns_aaaa:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
 
 load-map-ecnet_dns_eips:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
 
 load-map-ecnet_sess_dest:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_sess_dest ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_sess_dest type lru_hash key 8 value 8 entries 65535 name ecnet_sess_dest
@@ -79,8 +80,8 @@ load-map-ecnet_sock_pair:
 
 clean-maps:
 	sudo rm -f \
-		$(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_aaaa \
-		$(PROG_MOUNT_PATH)/xdp/globals/ecnet_dns_eips \
+		$(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
+		$(PROG_MOUNT_PATH)/ecnet_dns_eips \
 		$(PROG_MOUNT_PATH)/ecnet_sess_dest \
 		$(PROG_MOUNT_PATH)/ecnet_pair_dest \
 		$(PROG_MOUNT_PATH)/ecnet_sock_pair \
@@ -88,12 +89,16 @@ clean-maps:
 		$(PROG_MOUNT_PATH)/sockopt
 
 load-dnsproxy: load-map-ecnet_dns_aaaa load-map-ecnet_dns_eips
+	sudo bpftool -m prog loadall ecnet_dnsproxy.o $(PROG_MOUNT_PATH)/dnxproxy \
+		map name ecnet_dns_aaaa pinned $(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
+		map name ecnet_dns_eips pinned $(PROG_MOUNT_PATH)/ecnet_dns_eips
 
 attach-dnsproxy:
-	sudo ip link set dev cni0 xdpgeneric obj ecnet_dnsproxy.o sec prog
+	sudo ip link set dev cni0 xdpgeneric pinned $(PROG_MOUNT_PATH)/dnxproxy/xdp
 
 clean-dnsproxy:
 	sudo ip link set dev cni0 xdpgeneric off
+	sudo rm -rf $(PROG_MOUNT_PATH)/dnxproxy
 
 load-connect: load-map-ecnet_sess_dest
 	sudo bpftool -m prog loadall ecnet_connect.o $(PROG_MOUNT_PATH)/connect \
