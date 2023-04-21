@@ -62,6 +62,12 @@ compile-clean:
 	[ -f ecnet_connect.c ] && sudo rm -f $(TARGETS)
 
 # Map
+load-map-ecnet_dns_aaaa:
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
+
+load-map-ecnet_dns_eips:
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
+
 load-map-ecnet_sess_dest:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_sess_dest ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_sess_dest type lru_hash key 8 value 8 entries 65535 name ecnet_sess_dest
 
@@ -73,11 +79,21 @@ load-map-ecnet_sock_pair:
 
 clean-maps:
 	sudo rm -f \
+		$(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
+		$(PROG_MOUNT_PATH)/ecnet_dns_eips \
 		$(PROG_MOUNT_PATH)/ecnet_sess_dest \
 		$(PROG_MOUNT_PATH)/ecnet_pair_dest \
 		$(PROG_MOUNT_PATH)/ecnet_sock_pair \
 		$(PROG_MOUNT_PATH)/sockops \
 		$(PROG_MOUNT_PATH)/sockopt
+
+load-dnsproxy: load-map-ecnet_dns_aaaa load-map-ecnet_dns_eips
+
+attach-dnsproxy:
+	sudo ip link set dev cni0 xdpgeneric obj bpf/ecnet_dnsproxy.o sec prog
+
+clean-dnsproxy:
+	sudo ip link set dev cni0 xdpgeneric off
 
 load-connect: load-map-ecnet_sess_dest
 	sudo bpftool -m prog loadall ecnet_connect.o $(PROG_MOUNT_PATH)/connect \
@@ -125,11 +141,11 @@ clean-sockops:
 	sudo bpftool cgroup detach $(CGROUP2_PATH) sock_ops pinned $(PROG_MOUNT_PATH)/sockops
 	sudo rm -rf $(PROG_MOUNT_PATH)/sockops
 
-load: compile init-bpffs load-connect load-redirmsg load-sockopt load-sockops
+load: compile init-bpffs load-dnsproxy load-connect load-redirmsg load-sockopt load-sockops
 
-attach: attach-connect attach-redirmsg attach-sockopt attach-sockops
+attach: attach-dnsproxy attach-connect attach-redirmsg attach-sockopt attach-sockops
 
-clean: clean-connect clean-redirmsg clean-sockopt clean-sockops clean-maps compile-clean
+clean: clean-dnsproxy clean-connect clean-redirmsg clean-sockopt clean-sockops clean-maps compile-clean
 
 all: compile
 
