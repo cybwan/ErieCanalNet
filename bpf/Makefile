@@ -63,11 +63,11 @@ compile-clean:
 	[ -f ecnet_connect.c ] && sudo rm -f $(TARGETS)
 
 # Map
-load-map-ecnet_dns_aaaa:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_aaaa ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_aaaa type lru_hash key 260 value 8 entries 65535 name ecnet_dns_aaaa
+load-map-ecnet_dns_resdb:
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_resdb ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_resdb type lru_hash key 260 value 8 entries 65535 name ecnet_dns_resdb
 
-load-map-ecnet_dns_eips:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_eips ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_eips type lru_hash key 4 value 8 entries 65535 name ecnet_dns_eips
+load-map-ecnet_dns_endpt:
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_endpt ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_endpt type lru_hash key 4 value 8 entries 65535 name ecnet_dns_endpt
 
 load-map-ecnet_sess_dest:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_sess_dest ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_sess_dest type lru_hash key 8 value 8 entries 65535 name ecnet_sess_dest
@@ -80,18 +80,18 @@ load-map-ecnet_sock_pair:
 
 clean-maps:
 	sudo rm -f \
-		$(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
-		$(PROG_MOUNT_PATH)/ecnet_dns_eips \
+		$(PROG_MOUNT_PATH)/ecnet_dns_resdb \
+		$(PROG_MOUNT_PATH)/ecnet_dns_endpt \
 		$(PROG_MOUNT_PATH)/ecnet_sess_dest \
 		$(PROG_MOUNT_PATH)/ecnet_pair_dest \
 		$(PROG_MOUNT_PATH)/ecnet_sock_pair \
 		$(PROG_MOUNT_PATH)/sockops \
 		$(PROG_MOUNT_PATH)/sockopt
 
-load-dnsproxy: load-map-ecnet_dns_aaaa load-map-ecnet_dns_eips
+load-dnsproxy: load-map-ecnet_dns_resdb load-map-ecnet_dns_endpt
 	sudo bpftool -m prog loadall ecnet_dnsproxy.o $(PROG_MOUNT_PATH)/dnxproxy \
-		map name ecnet_dns_aaaa pinned $(PROG_MOUNT_PATH)/ecnet_dns_aaaa \
-		map name ecnet_dns_eips pinned $(PROG_MOUNT_PATH)/ecnet_dns_eips
+		map name ecnet_dns_resdb pinned $(PROG_MOUNT_PATH)/ecnet_dns_resdb \
+		map name ecnet_dns_endpt pinned $(PROG_MOUNT_PATH)/ecnet_dns_endpt
 
 attach-dnsproxy:
 	sudo ip link set dev cni0 xdpgeneric pinned $(PROG_MOUNT_PATH)/dnxproxy/xdp

@@ -67,7 +67,7 @@ __section("xdp") int ecnet_dns_proxy(struct xdp_md *ctx)
     }
 
     __u32 eip = ip->daddr;
-    __u32 *cluster_ip = bpf_map_lookup_elem(&ecnet_dns_eips, &eip);
+    __u32 *cluster_ip = bpf_map_lookup_elem(&ecnet_dns_endpt, &eip);
     // If record pointer is zero
     if (!cluster_ip) {
         return XDP_PASS;
@@ -283,7 +283,7 @@ static int match_a_records(struct xdp_md *ctx, struct dns_query *q,
 #endif
 
     struct a_record *record;
-    record = bpf_map_lookup_elem(&ecnet_dns_aaaa, q);
+    record = bpf_map_lookup_elem(&ecnet_dns_resdb, q);
 
     // If record pointer is not zero..
     if (record > 0) {
