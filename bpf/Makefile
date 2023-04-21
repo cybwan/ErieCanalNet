@@ -90,7 +90,7 @@ clean-maps:
 load-dnsproxy: load-map-ecnet_dns_aaaa load-map-ecnet_dns_eips
 
 attach-dnsproxy:
-	sudo ip link set dev cni0 xdpgeneric obj bpf/ecnet_dnsproxy.o sec prog
+	sudo ip link set dev cni0 xdpgeneric obj ecnet_dnsproxy.o sec prog
 
 clean-dnsproxy:
 	sudo ip link set dev cni0 xdpgeneric off
