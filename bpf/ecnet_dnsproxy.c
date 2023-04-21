@@ -6,8 +6,6 @@
 #include <linux/in.h>
 #include <linux/ip.h>
 #include <linux/udp.h>
-#include <linux/version.h>
-#include <string.h>
 
 char dns_buffer[512];
 
@@ -22,10 +20,10 @@ static int match_a_records(struct xdp_md *ctx, struct dns_query *q,
 static int parse_query(struct xdp_md *ctx, void *query_start,
                        struct dns_query *q);
 static void create_query_response(struct a_record *a, char *dns_buffer,
-                                  size_t *buf_size);
+                                  __u32 *buf_size);
 static inline void modify_dns_header_response(struct dnshdr *dns_hdr);
 static inline void copy_to_pkt_buf(struct xdp_md *ctx, void *dst, void *src,
-                                   size_t n);
+                                   __u32 n);
 
 #define MAX_UDP_SIZE 1480
 
@@ -111,7 +109,7 @@ __section("prog") int ecnet_dns_proxy(struct xdp_md *ctx)
             int res = match_a_records(ctx, &q, &a_record);
             // If query matches...
             if (res == 0) {
-                size_t buf_size = 0;
+                __u32 buf_size = 0;
 
                 // Change DNS header to a valid response header
                 modify_dns_header_response(dns_hdr);
@@ -367,7 +365,7 @@ static int parse_query(struct xdp_md *ctx, void *query_start,
 }
 
 static void create_query_response(struct a_record *a, char *dns_buffer,
-                                  size_t *buf_size)
+                                  __u32 *buf_size)
 {
     // Formulate a DNS response. Currently defaults to hardcoded query pointer +
     // type a + class in + ttl + 4 bytes as reply.
@@ -403,7 +401,7 @@ static inline void modify_dns_header_response(struct dnshdr *dns_hdr)
 // The following function is a memcpy wrapper that uses __builtin_memcpy when
 // size_t n is known. Otherwise it uses our own naive & slow memcpy routine
 static inline void copy_to_pkt_buf(struct xdp_md *ctx, void *dst, void *src,
-                                   size_t n)
+                                   __u32 n)
 {
     // Boundary check
     if ((void *)(long)ctx->data_end >= dst + n) {
@@ -431,5 +429,5 @@ static inline void copy_to_pkt_buf(struct xdp_md *ctx, void *dst, void *src,
     }
 }
 
-char _license[] __section("license") = "GPL";
-__u32 _version __section("version") = LINUX_VERSION_CODE;
+char ____license[] __section("license") = "GPL";
+int _version __section("version") = 1;
