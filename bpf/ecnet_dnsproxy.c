@@ -7,7 +7,7 @@
 #include <linux/ip.h>
 #include <linux/udp.h>
 
-char dns_buffer[512];
+static char dns_buffer[512];
 
 static void swap_src_dst_mac(struct ethhdr *eth);
 static void swap_src_dst_udp(struct udphdr *udph);
