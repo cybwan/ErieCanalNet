@@ -3,12 +3,14 @@ package main
 
 import (
 	"flag"
+	"os"
+
+	"github.com/cilium/ebpf/rlimit"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
 
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/config"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/controller/helpers"
@@ -78,6 +80,10 @@ func main() {
 
 	if err = helpers.LoadProgs(config.KernelTracing); err != nil {
 		log.Fatal().Msgf("failed to load ebpf programs: %v", err)
+	}
+
+	if err = rlimit.RemoveMemlock(); err != nil {
+		log.Fatal().Msgf("remove memlock error: %v", err)
 	}
 
 	stop := make(chan struct{}, 1)
