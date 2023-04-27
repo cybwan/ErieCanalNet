@@ -80,7 +80,7 @@ __section("xdp") int ecnet_dns_proxy(struct xdp_md *ctx)
         debugf("-------------------------------");
         debugf("udp dst ip:%pI4 port:%d", &ip->daddr, bpf_ntohs(udp->dest));
         debugf("udp src ip:%pI4 port:%d", &ip->saddr, bpf_ntohs(udp->source));
-        debugf("Packet dest port 53");
+        debugf("dns cluster ip:%pI4", cluster_ip);
         debugf("Data pointer starts at %u", data);
 #endif
 
@@ -279,7 +279,7 @@ static int match_a_records(struct xdp_md *ctx, struct dns_query *q,
 #ifdef DEBUG
     debugf("DNS record type: %i", q->record_type);
     debugf("DNS class: %i", q->class);
-    // debugf("DNS name: %s", q->name);
+    debugf("DNS name: %s", q->name);
 #endif
 
     struct a_record *record;
@@ -287,12 +287,11 @@ static int match_a_records(struct xdp_md *ctx, struct dns_query *q,
 
     // If record pointer is not zero..
     if (record > 0) {
+        a->ip_addr = record->ip_addr;
+        a->ttl = record->ttl;
 #ifdef DEBUG
         debugf("DNS query matched");
 #endif
-
-        a->ip_addr = record->ip_addr;
-        a->ttl = record->ttl;
         return 0;
     }
     return -1;

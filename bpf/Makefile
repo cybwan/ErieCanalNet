@@ -67,7 +67,7 @@ load-map-ecnet_dns_resdb:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_resdb ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_resdb type lru_hash key 260 value 8 entries 65535 name ecnet_dns_resdb
 
 load-map-ecnet_dns_endpt:
-	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_endpt ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_endpt type lru_hash key 4 value 8 entries 65535 name ecnet_dns_endpt
+	[ -f $(PROG_MOUNT_PATH)/ecnet_dns_endpt ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_dns_endpt type lru_hash key 4 value 4 entries 65535 name ecnet_dns_endpt
 
 load-map-ecnet_sess_dest:
 	[ -f $(PROG_MOUNT_PATH)/ecnet_sess_dest ] || sudo bpftool map create $(PROG_MOUNT_PATH)/ecnet_sess_dest type lru_hash key 8 value 8 entries 65535 name ecnet_sess_dest
