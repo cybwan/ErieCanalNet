@@ -23,4 +23,5 @@ type Server struct {
 	workQueues     *workerpool.WorkerPool
 	kubeController k8s.Controller
 	msgBroker      *messaging.Broker
+	dnsEndpoints   map[string]string
 }

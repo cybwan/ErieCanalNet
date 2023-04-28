@@ -48,6 +48,4 @@ type MeshCataloger interface {
 
 	// GetOutboundMeshTrafficPolicy returns the outbound mesh traffic policy for the given downstream identity
 	GetOutboundMeshTrafficPolicy() *policy.OutboundMeshTrafficPolicy
-
-	DoTest()
 }

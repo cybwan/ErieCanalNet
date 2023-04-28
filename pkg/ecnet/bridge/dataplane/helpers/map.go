@@ -1,14 +1,21 @@
-// Package helpers implements ebpf helpers.
 package helpers
 
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/cilium/ebpf"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/config"
-	"github.com/miekg/dns"
 	"net"
 	"unsafe"
+
+	"github.com/cilium/ebpf"
+	"github.com/miekg/dns"
+)
+
+const (
+	// ECNetDNSResolveMap is the mount point of ecnet_dns_resdb map
+	ECNetDNSResolveMap = "/sys/fs/bpf/ecnet_dns_resdb"
+
+	// ECNetDNSEndpointMap is the mount point of ecnet_dns_endpt map
+	ECNetDNSEndpointMap = "/sys/fs/bpf/ecnet_dns_endpt"
 )
 
 var (
@@ -34,13 +41,13 @@ type AAAARecord struct {
 // InitLoadPinnedMap init, load and pinned maps
 func InitLoadPinnedMap() error {
 	var err error
-	dnsResolveMap, err = ebpf.LoadPinnedMap(config.ECNetDNSResolveMap, &ebpf.LoadPinOptions{})
+	dnsResolveMap, err = ebpf.LoadPinnedMap(ECNetDNSResolveMap, &ebpf.LoadPinOptions{})
 	if err != nil {
-		return fmt.Errorf("load map[%s] error: %v", config.ECNetDNSResolveMap, err)
+		return fmt.Errorf("load map[%s] error: %v", ECNetDNSResolveMap, err)
 	}
-	dnsEndpointMap, err = ebpf.LoadPinnedMap(config.ECNetDNSEndpointMap, &ebpf.LoadPinOptions{})
+	dnsEndpointMap, err = ebpf.LoadPinnedMap(ECNetDNSEndpointMap, &ebpf.LoadPinOptions{})
 	if err != nil {
-		return fmt.Errorf("load map[%s] error: %v", err, config.ECNetDNSEndpointMap)
+		return fmt.Errorf("load map[%s] error: %v", err, ECNetDNSEndpointMap)
 	}
 	return nil
 }
@@ -90,21 +97,24 @@ func DoTest() {
 		}
 	}
 
-	dnsEIp1 := "10.244.0.2"
-	dnsEIp2 := "10.244.0.3"
-	dnsCCp := "10.96.0.10"
+}
 
-	dnsEIpPtr1, _ := ip2ptr(dnsEIp1)
-	dnsEIpPtr2, _ := ip2ptr(dnsEIp2)
-	dnsCCpPtr, _ := ip2ptr(dnsCCp)
-
-	err := GetDNSEndpointMap().Update(dnsEIpPtr1, dnsCCpPtr, ebpf.UpdateAny)
+// UpdateDNSEndpointEntry updates DNS Endpoint Entry
+func UpdateDNSEndpointEntry(dnsEndpointIP, dnsClusterIP string) {
+	dnsEIPPtr, _ := ip2ptr(dnsEndpointIP)
+	dnsCIPPtr, _ := ip2ptr(dnsClusterIP)
+	err := GetDNSEndpointMap().Update(dnsEIPPtr, dnsCIPPtr, ebpf.UpdateAny)
 	if err != nil {
 		log.Error().Msgf("update ecnet_dns_endpt error: %v", err)
 	}
-	err = GetDNSEndpointMap().Update(dnsEIpPtr2, dnsCCpPtr, ebpf.UpdateAny)
+}
+
+// DeleteDNSEndpointEntry deletes DNS Endpoint Entry
+func DeleteDNSEndpointEntry(dnsEndpointIP string) {
+	dnsEIPPtr, _ := ip2ptr(dnsEndpointIP)
+	err := GetDNSEndpointMap().Delete(dnsEIPPtr)
 	if err != nil {
-		log.Error().Msgf("update ecnet_dns_endpt error: %v", err)
+		log.Error().Msgf("delete ecnet_dns_endpt error: %v", err)
 	}
 }
 

@@ -1,12 +1,7 @@
 package catalog
 
 import (
-	"fmt"
-	"net"
-
 	mapset "github.com/deckarep/golang-set"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/endpoint"
-
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/constants"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/errcode"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s"
@@ -190,45 +185,4 @@ func (mc *MeshCatalog) mergeUpstreamClusters(meshSvc service.MeshService, upstre
 // Note: ServiceIdentity must be in the format "name.namespace" [https://github.com/flomesh-io/ErieCanal/issues/3188]
 func (mc *MeshCatalog) ListOutboundServices() []service.MeshService {
 	return mc.listMeshServices()
-}
-
-func (mc *MeshCatalog) DoTest() {
-	dnsSvc := service.MeshService{
-		Namespace: "kube-system",
-		Name:      "kube-dns",
-		Port:      53,
-		Protocol:  "udp",
-	}
-	var endpoints []endpoint.Endpoint
-	svc := mc.kubeController.GetService(dnsSvc)
-	if dnsEndpoints, err := mc.kubeController.GetEndpoints(dnsSvc); err == nil {
-		for _, dnsEndpoint := range dnsEndpoints.Subsets {
-			for _, port := range dnsEndpoint.Ports {
-				if port.Port != int32(dnsSvc.Port) {
-					continue
-				}
-				for _, address := range dnsEndpoint.Addresses {
-					if dnsSvc.Subdomain() != "" && dnsSvc.Subdomain() != address.Hostname {
-						// if there's a subdomain on this meshservice, make sure it matches the endpoint's hostname
-						continue
-					}
-					ip := net.ParseIP(address.IP)
-					if ip == nil {
-						log.Error().Msgf("Error parsing endpoint IP address %s for MeshService %s", address.IP, dnsSvc)
-						continue
-					}
-					ept := endpoint.Endpoint{
-						IP:   ip,
-						Port: endpoint.Port(port.Port),
-					}
-					endpoints = append(endpoints, ept)
-				}
-			}
-		}
-	} else {
-		fmt.Println(err.Error())
-	}
-	for _, endpoint := range endpoints {
-		fmt.Println(svc.Spec.ClusterIP, endpoint)
-	}
 }

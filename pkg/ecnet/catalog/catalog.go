@@ -41,9 +41,3 @@ func NewMeshCatalog(kubeController k8s.Controller,
 func (mc *MeshCatalog) GetKubeController() k8s.Controller {
 	return mc.kubeController
 }
-
-// GetTrustDomain returns the currently configured trust domain, ie: cluster.local
-func (mc *MeshCatalog) GetTrustDomain() string {
-	// TODO benne
-	return "cluster.local"
-}

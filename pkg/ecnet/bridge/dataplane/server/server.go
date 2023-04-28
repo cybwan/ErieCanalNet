@@ -2,9 +2,11 @@ package server
 
 import (
 	"fmt"
+
 	"github.com/cilium/ebpf/rlimit"
+
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/dataplane/helpers"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/controller/helpers"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
@@ -28,6 +30,7 @@ func NewBridgeServer(meshCatalog catalog.MeshCataloger, ecnetNamespace string, c
 		workQueues:     workerpool.NewWorkerPool(workerPoolSize),
 		kubeController: kubecontroller,
 		msgBroker:      msgBroker,
+		dnsEndpoints:   make(map[string]string),
 	}
 	return &server
 }
@@ -46,8 +49,12 @@ func (s *Server) Start(kernelTracing bool, bridgeEth string) error {
 	if err := helpers.AttachProgs(); err != nil {
 		return fmt.Errorf("failed to attach ebpf programs: %v", err)
 	}
-	s.catalog.DoTest()
+
+	// Start broadcast listener thread
+	go s.broadcastListener()
+
 	s.ready = true
+
 	return nil
 }
 

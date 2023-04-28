@@ -1,5 +1,4 @@
-// Package config defines the constants that are used by multiple other packages within ECNET.
-package config
+package server
 
 const (
 	// ECNetDNSResolveMap is the mount point of ecnet_dns_resdb map

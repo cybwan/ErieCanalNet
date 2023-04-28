@@ -95,6 +95,7 @@ load-dnsproxy: load-map-ecnet_dns_resdb load-map-ecnet_dns_endpt
 		map name ecnet_dns_endpt pinned $(PROG_MOUNT_PATH)/ecnet_dns_endpt
 
 attach-dnsproxy:
+	sudo ip link set dev $(BRIDGE_ETH) xdpgeneric off
 	sudo ip link set dev $(BRIDGE_ETH) xdpgeneric pinned $(PROG_MOUNT_PATH)/dnxproxy/xdp
 
 clean-dnsproxy:
