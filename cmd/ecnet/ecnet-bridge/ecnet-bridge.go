@@ -5,6 +5,18 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/spf13/pflag"
+	admissionv1 "k8s.io/api/admissionregistration/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/dataplane/server"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
@@ -17,6 +29,7 @@ import (
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s/events"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s/informers"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/logger"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/endpoint"
@@ -24,19 +37,6 @@ import (
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/providers/fsm"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/providers/kube"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/signals"
-	admissionv1 "k8s.io/api/admissionregistration/v1"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net/http"
-	"os"
-
-	"github.com/spf13/pflag"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
-	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/clientcmd"
-
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/logger"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/version"
 )
 
