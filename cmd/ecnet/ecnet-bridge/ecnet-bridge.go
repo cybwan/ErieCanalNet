@@ -4,11 +4,12 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane/registry"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane/server"
+	"fmt"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/dataplane/server"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/constants"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/errcode"
 	configClientset "github.com/flomesh-io/ErieCanal/pkg/ecnet/gen/client/config/clientset/versioned"
 	multiclusterClientset "github.com/flomesh-io/ErieCanal/pkg/ecnet/gen/client/multicluster/clientset/versioned"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/health"
@@ -24,6 +25,8 @@ import (
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/providers/kube"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/signals"
 	admissionv1 "k8s.io/api/admissionregistration/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"net/http"
 	"os"
 
@@ -46,6 +49,7 @@ var (
 	ecnetConfigName     string
 	ecnetVersion        string
 	trustDomain         string
+	kernelTracing       bool
 
 	scheme = runtime.NewScheme()
 )
@@ -67,7 +71,7 @@ func init() {
 	flags.StringVar(&trustDomain, "trust-domain", "cluster.local", "The trust domain to use as part of the common name when requesting new certificates")
 
 	// Get some flags from commands
-	flags.BoolVarP(&config.KernelTracing, "kernel-tracing", "d", false, "kernel tracing mode")
+	flags.BoolVarP(&kernelTracing, "kernel-tracing", "d", false, "kernel tracing mode")
 	flags.StringVar(&config.BridgeEth, "bridge-eth", "cni0", "bridge veth created by CNI")
 
 	_ = clientgoscheme.AddToScheme(scheme)
@@ -91,6 +95,16 @@ func main() {
 	kubeClient := kubernetes.NewForConfigOrDie(kubeConfig)
 	configClient := configClientset.NewForConfigOrDie(kubeConfig)
 	multiclusterClient := multiclusterClientset.NewForConfigOrDie(kubeConfig)
+
+	// Initialize the generic Kubernetes event recorder and associate it with the ecnet-dataplane pod resource
+	bridgePod, err := getECNETBridgePod(kubeClient)
+	if err != nil {
+		log.Fatal().Msg("Error fetching ecnet-ctrlplane pod")
+	}
+	eventRecorder := events.GenericEventRecorder()
+	if err = eventRecorder.Initialize(bridgePod, kubeClient, ecnetNamespace); err != nil {
+		log.Fatal().Msg("Error initializing generic event recorder")
+	}
 
 	k8s.SetTrustDomain(trustDomain)
 
@@ -116,15 +130,15 @@ func main() {
 	// This component will be watching resources in the config.flomesh.io API group
 	cfg := configurator.NewConfigurator(informerCollection, ecnetNamespace, ecnetConfigName, msgBroker)
 	k8sClient := k8s.NewKubernetesController(informerCollection, msgBroker)
-	multiclusterController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
+	mcController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
 	kubeProvider := kube.NewClient(k8sClient, cfg)
-	multiclusterProvider := fsm.NewClient(multiclusterController, cfg)
-	endpointsProviders := []endpoint.Provider{kubeProvider, multiclusterProvider}
-	serviceProviders := []service.Provider{kubeProvider, multiclusterProvider}
+	mcProvider := fsm.NewClient(mcController, cfg)
+	endpointsProviders := []endpoint.Provider{kubeProvider, mcProvider}
+	serviceProviders := []service.Provider{kubeProvider, mcProvider}
 
 	meshCatalog := catalog.NewMeshCatalog(
 		k8sClient,
-		multiclusterController,
+		mcController,
 		stop,
 		cfg,
 		serviceProviders,
@@ -132,9 +146,8 @@ func main() {
 		msgBroker,
 	)
 
-	proxyRegistry := registry.NewProxyRegistry(msgBroker)
-	dataPlaneServer := server.NewRepoServer(meshCatalog, proxyRegistry, ecnetNamespace, cfg, k8sClient, msgBroker)
-	if err = dataPlaneServer.Start(cfg.GetProxyServerPort()); err != nil {
+	dataPlaneServer := server.NewBridgeServer(meshCatalog, ecnetNamespace, cfg, k8sClient, msgBroker)
+	if err = dataPlaneServer.Start(kernelTracing); err != nil {
 		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing proxy control server")
 	}
 
@@ -192,4 +205,23 @@ func parseFlags() error {
 	}
 	_ = flag.CommandLine.Parse([]string{})
 	return nil
+}
+
+// getECNETBridgePod returns the ecnet-dataplane pod.
+// The pod name is inferred from the 'BRIDGE_POD_NAME' env variable which is set during deployment.
+func getECNETBridgePod(kubeClient kubernetes.Interface) (*corev1.Pod, error) {
+	podName := os.Getenv("BRIDGE_POD_NAME")
+	if podName == "" {
+		return nil, fmt.Errorf("BRIDGE_POD_NAME env variable cannot be empty")
+	}
+
+	pod, err := kubeClient.CoreV1().Pods(ecnetNamespace).Get(context.TODO(), podName, metav1.GetOptions{})
+	if err != nil {
+		// TODO(#3962): metric might not be scraped before process restart resulting from this error
+		log.Error().Err(err).Str(errcode.Kind, errcode.GetErrCodeWithMetric(errcode.ErrFetchingBridgePod)).
+			Msgf("Error retrieving ecnet-dataplane pod %s", podName)
+		return nil, err
+	}
+
+	return pod, nil
 }

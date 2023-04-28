@@ -21,6 +21,9 @@ const (
 
 	// ErrFetchingControllerPod indicates the ecnet-ctrlplane pod resource could not be fetched
 	ErrFetchingControllerPod
+
+	// ErrFetchingBridgePod indicates the ecnet-dataplane pod resource could not be fetched
+	ErrFetchingBridgePod
 )
 
 // Range 2000-2500 is reserved for errors related to traffic policies

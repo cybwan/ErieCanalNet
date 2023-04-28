@@ -131,15 +131,15 @@ func main() {
 	// This component will be watching resources in the config.flomesh.io API group
 	cfg := configurator.NewConfigurator(informerCollection, ecnetNamespace, ecnetConfigName, msgBroker)
 	k8sClient := k8s.NewKubernetesController(informerCollection, msgBroker)
-	multiclusterController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
+	mcController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
 	kubeProvider := kube.NewClient(k8sClient, cfg)
-	multiclusterProvider := fsm.NewClient(multiclusterController, cfg)
-	endpointsProviders := []endpoint.Provider{kubeProvider, multiclusterProvider}
-	serviceProviders := []service.Provider{kubeProvider, multiclusterProvider}
+	mcProvider := fsm.NewClient(mcController, cfg)
+	endpointsProviders := []endpoint.Provider{kubeProvider, mcProvider}
+	serviceProviders := []service.Provider{kubeProvider, mcProvider}
 
 	meshCatalog := catalog.NewMeshCatalog(
 		k8sClient,
-		multiclusterController,
+		mcController,
 		stop,
 		cfg,
 		serviceProviders,

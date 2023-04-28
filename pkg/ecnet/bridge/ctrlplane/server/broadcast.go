@@ -1,4 +1,3 @@
-// Package server implements broadcast's methods.
 package server
 
 import (

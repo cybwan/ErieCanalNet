@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	// ServerType is the type identifier for the ADS server
-	ServerType = "pipy-Repo"
+	// ServerType is the type identifier for the ctrl server
+	ServerType = "pipy-repo"
 
 	// workerPoolSize is the default number of workerpool workers (0 is GOMAXPROCS)
 	workerPoolSize = 0

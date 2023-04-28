@@ -1,3 +1,4 @@
+// Package server implements ctrl plane server.
 package server
 
 import (

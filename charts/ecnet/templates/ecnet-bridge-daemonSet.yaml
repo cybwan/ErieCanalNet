@@ -1,45 +1,3 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ecnet-bridge
-  namespace: {{ include "ecnet.namespace" . }}
-  labels:
-    {{- include "ecnet.labels" . | nindent 4 }}
-    app: ecnet-bridge
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ecnet-bridge
-  labels:
-    {{- include "ecnet.labels" . | nindent 4 }}
-    app: ecnet-bridge
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - list
-      - get
-      - watch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: ecnet-bridge
-  labels:
-    {{- include "ecnet.labels" . | nindent 4 }}
-    app: ecnet-bridge
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: ecnet-bridge
-subjects:
-  - kind: ServiceAccount
-    name: ecnet-bridge
-    namespace: {{ include "ecnet.namespace" . }}
----
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -61,6 +19,9 @@ spec:
   {{- if .Values.ecnet.ecnetController.podLabels }}
   {{- toYaml .Values.ecnet.ecnetController.podLabels | nindent 8 }}
   {{- end }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9091'
     spec:
       {{- if .Values.ecnet.ecnetController.affinity }}
       affinity:
@@ -70,7 +31,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       priorityClassName: system-node-critical
-      serviceAccountName: ecnet-bridge
+      serviceAccountName: {{ .Release.Name }}
+      initContainers:
+        - name: init
+          image: {{ .Values.ecnet.curlImage }}
+          command: [ "curl", "http://ecnet-bootstrap.{{ include "ecnet.namespace" . }}:9091/healthz", "--connect-timeout", "2", "--retry", "50", "--retry-connrefused", "--retry-delay", "5" ]
       containers:
         - name: proxy
           image: {{ $.Values.ecnet.proxyImage }}
