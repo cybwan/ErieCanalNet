@@ -87,7 +87,7 @@ func (a *namespaceAddCmd) run() error {
 		}
 		list, _ := deploymentsClient.List(context.TODO(), listOptions)
 
-		// if ecnet-controller is installed in this namespace then don't add that to mesh
+		// if ecnet-ctrlplane is installed in this namespace then don't add that to mesh
 		if len(list.Items) != 0 {
 			_, _ = fmt.Fprintf(a.out, "Namespace [%s] already has [%s] installed and cannot be added to ecnet [%s]\n", ns, constants.ECNETControllerName, a.ecnetName)
 			continue

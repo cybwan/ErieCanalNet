@@ -71,13 +71,6 @@ spec:
       restartPolicy: Always
       priorityClassName: system-node-critical
       serviceAccountName: ecnet-bridge
-#      initContainers:
-#        - name: init
-#          image: {{ include "ecnetBridgeInit.image" . }}
-#          command: ['/check-eth']
-#          args: [
-#            "{{ .Values.ecnet.ecnetBridge.cni.hostCniBridgeEth }}",
-#          ]
       containers:
         - name: proxy
           image: {{ $.Values.ecnet.proxyImage }}
@@ -100,10 +93,19 @@ spec:
         - name: bridge
           image: "{{ include "ecnetBridge.image" . }}"
           imagePullPolicy: {{ .Values.ecnet.image.pullPolicy }}
+          ports:
+            - name: "admin-port"
+              containerPort: 15000
+            - name: "metrics"
+              containerPort: 9091
           command: ['/ec/ecnet-bridge']
           args: [
             "--verbosity", "{{.Values.ecnet.controllerLogLevel}}",
+            "--ecnet-namespace", "{{ include "ecnet.namespace" . }}",
             "--ecnet-version", "{{ .Chart.AppVersion }}",
+            "--ecnet-service-account", "{{ .Release.Name }}",
+            "--ecnet-name", "{{.Values.ecnet.ecnetName}}",
+            "--trust-domain", "{{.Values.ecnet.trustDomain}}",
             "--bridge-eth={{ .Values.ecnet.ecnetBridge.cni.hostCniBridgeEth }}",
             "--kernel-tracing={{ .Values.ecnet.ecnetBridge.kernelTracing }}",
           ]
@@ -121,6 +123,25 @@ spec:
             requests:
               cpu: "{{.Values.ecnet.ecnetBridge.resource.requests.cpu}}"
               memory: "{{.Values.ecnet.ecnetBridge.resource.requests.memory}}"
+          readinessProbe:
+            initialDelaySeconds: 1
+            timeoutSeconds: 5
+            httpGet:
+              scheme: HTTP
+              path: /health/ready
+              port: 9091
+          livenessProbe:
+            initialDelaySeconds: 1
+            timeoutSeconds: 5
+            httpGet:
+              scheme: HTTP
+              path: /health/alive
+              port: 9091
+          env:
+            - name: BRIDGE_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           securityContext:
             privileged: true
       tolerations:

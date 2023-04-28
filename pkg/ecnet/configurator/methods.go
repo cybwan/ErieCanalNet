@@ -19,7 +19,7 @@ func (c *Client) GetEcnetConfig() configv1alpha1.EcnetConfig {
 	return c.getEcnetConfig()
 }
 
-// GetEcnetNamespace returns the namespace in which the ECNET controller pod resides.
+// GetEcnetNamespace returns the namespace in which the ECNET ctrlplane pod resides.
 func (c *Client) GetEcnetNamespace() string {
 	return c.ecnetNamespace
 }

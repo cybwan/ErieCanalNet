@@ -207,11 +207,11 @@ func (c *Client) GetEndpoints(svc service.MeshService) (*corev1.Endpoints, error
 				}
 				lbWeight := 0
 				if len(clusterKeys) > 0 {
-					if weight, found := clusterKeys[endpoint.ClusterKey]; !found {
+					weight, found := clusterKeys[endpoint.ClusterKey]
+					if !found {
 						continue
-					} else {
-						lbWeight = weight
 					}
+					lbWeight = weight
 				}
 				targetEndpoints.Annotations[fmt.Sprintf(ServiceImportClusterKeyAnnotation, endpoint.Target.IP, endpoint.Target.Port)] = endpoint.ClusterKey
 				targetEndpoints.Annotations[fmt.Sprintf(ServiceImportContextPathAnnotation, endpoint.Target.IP, endpoint.Target.Port)] = endpoint.Target.Path

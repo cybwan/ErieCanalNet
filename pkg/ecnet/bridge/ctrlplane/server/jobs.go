@@ -6,16 +6,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/pipy/repo/client"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/pipy/repo/codebase"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/pipy/util"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver"
 )
 
 // PipyConfGeneratorJob is the job to generate pipy policy json
 type PipyConfGeneratorJob struct {
-	proxy      *proxyserver.Proxy
+	proxy      *ctrlplane.Proxy
 	repoServer *Server
 
 	// Optional waiter
@@ -49,6 +49,8 @@ func (job *PipyConfGeneratorJob) Run() {
 	balance(pipyConf)
 	reorder(pipyConf)
 	job.publishSidecarConf(s.repoClient, proxy, pipyConf, pluginSetV)
+
+	cataloger.DoTest()
 }
 
 func balance(pipyConf *PipyConf) {
@@ -67,14 +69,10 @@ func reorder(pipyConf *PipyConf) {
 	}
 }
 
-func outbound(cataloger catalog.MeshCataloger, s *Server, pipyConf *PipyConf, proxy *proxyserver.Proxy) bool {
+func outbound(cataloger catalog.MeshCataloger, s *Server, pipyConf *PipyConf, proxy *ctrlplane.Proxy) bool {
 	outboundTrafficPolicy := cataloger.GetOutboundMeshTrafficPolicy()
 	if len(outboundTrafficPolicy.ServicesResolvableSet) > 0 {
 		pipyConf.DNSResolveDB = outboundTrafficPolicy.ServicesResolvableSet
-		//pipyConf.DNSResolveDB = make(map[string][]string)
-		//for k := range outboundTrafficPolicy.ServicesResolvableSet {
-		//	pipyConf.DNSResolveDB[k] = []string{"10.244.2.1"}
-		//}
 	}
 	outboundDependClusters := generatePipyOutboundTrafficRoutePolicy(pipyConf, outboundTrafficPolicy)
 	if len(outboundDependClusters) > 0 {
@@ -94,7 +92,7 @@ func plugin(s *Server, pipyConf *PipyConf) (pluginSetVersion string) {
 	return
 }
 
-func features(s *Server, proxy *proxyserver.Proxy, pipyConf *PipyConf) {
+func features(s *Server, proxy *ctrlplane.Proxy, pipyConf *PipyConf) {
 	if mc, ok := s.catalog.(*catalog.MeshCatalog); ok {
 		meshConf := mc.GetConfigurator()
 		proxy.MeshConf = meshConf
@@ -107,7 +105,7 @@ var (
 	repoLock sync.RWMutex
 )
 
-func (job *PipyConfGeneratorJob) publishSidecarConf(repoClient *client.PipyRepoClient, proxy *proxyserver.Proxy, pipyConf *PipyConf, pluginSetV string) {
+func (job *PipyConfGeneratorJob) publishSidecarConf(repoClient *client.PipyRepoClient, proxy *ctrlplane.Proxy, pipyConf *PipyConf, pluginSetV string) {
 	repoLock.Lock()
 	defer func() {
 		repoLock.Unlock()

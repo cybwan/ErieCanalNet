@@ -8,13 +8,13 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane/registry"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/logger"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/pipy/repo/client"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver/registry"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/policy"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/workerpool"

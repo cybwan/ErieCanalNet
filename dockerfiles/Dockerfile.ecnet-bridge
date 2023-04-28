@@ -15,7 +15,7 @@ ADD . .
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    go build -v -ldflags "-s -w" -o ./dist/ecnet-bridge ./cmd/ecnet/ecnet-bridge/ecnet-bridge.go
+    go build -v -ldflags "-s -w" -o ./dist/ecnet-bridge ./cmd/ecnet/ecnet-bridge
 
 FROM flomesh/ebpf:base20.04
 

@@ -2,6 +2,7 @@ package podwatcher
 
 import (
 	"fmt"
+
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/controller/helpers"
@@ -9,6 +10,11 @@ import (
 
 func runLocalPodController(client kubernetes.Interface, stop chan struct{}) error {
 	var err error
+
+	if err = helpers.InitLoadPinnedMap(); err != nil {
+		return fmt.Errorf("failed to load ebpf maps: %v", err)
+	}
+	helpers.DoTest()
 
 	w := newWatcher(createLocalPodController(client))
 

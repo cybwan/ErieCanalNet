@@ -1,6 +1,6 @@
-// Package proxyserver implements utility routines related to Pipy proxy, and models an instance of a proxy
+// Package ctrlplane implements utility routines related to Pipy proxy, and models an instance of a proxy
 // to be able to generate XDS configurations for it.
-package proxyserver
+package ctrlplane
 
 // NetAddr represents a network end point address.
 //

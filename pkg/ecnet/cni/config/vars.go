@@ -5,6 +5,4 @@ var (
 	KernelTracing = false
 	// BridgeEth indicates cni bridge dev
 	BridgeEth string
-	// HostProc defines HostProc volume
-	HostProc string
 )

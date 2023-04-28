@@ -108,7 +108,7 @@ func getEcnetInfoList(restConfig *rest.Config, clientSet kubernetes.Interface) (
 	return ecnetInfoList, nil
 }
 
-// getControllerDeployments returns a list of Deployments corresponding to ecnet-controller
+// getControllerDeployments returns a list of Deployments corresponding to ecnet-ctrlplane
 func getControllerDeployments(clientSet kubernetes.Interface) (*appsv1.DeploymentList, error) {
 	deploymentsClient := clientSet.AppsV1().Deployments("") // Get deployments from all namespaces
 	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{constants.AppLabel: constants.ECNETControllerName}}
@@ -118,7 +118,7 @@ func getControllerDeployments(clientSet kubernetes.Interface) (*appsv1.Deploymen
 	return deploymentsClient.List(context.TODO(), listOptions)
 }
 
-// getControllerPods returns a list of ecnet-controller Pods in a specified namespace
+// getControllerPods returns a list of ecnet-ctrlplane Pods in a specified namespace
 func getControllerPods(clientSet kubernetes.Interface, namespace string) (*corev1.PodList, error) {
 	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{constants.AppLabel: constants.ECNETControllerName}}
 	podClient := clientSet.CoreV1().Pods(namespace)

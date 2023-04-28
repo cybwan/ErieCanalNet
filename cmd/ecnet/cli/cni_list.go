@@ -12,7 +12,7 @@ import (
 )
 
 const cniListDescription = `
-This command will list all the ecnet control planes running in a Kubernetes cluster and controller pods.`
+This command will list all the ecnet control planes running in a Kubernetes cluster and ctrlplane pods.`
 
 type cniListCmd struct {
 	out       io.Writer
@@ -83,7 +83,7 @@ func (l *cniListCmd) run() error {
 	fmt.Fprint(w, getPrettyPrintedCniInfoList(cniInfoList))
 	_ = w.Flush()
 
-	fmt.Fprintf(l.out, "\nTo list the ECNET controller pods, please run the following command passing in the ecnet's namespace\n")
+	fmt.Fprintf(l.out, "\nTo list the ECNET ctrlplane pods, please run the following command passing in the ecnet's namespace\n")
 	fmt.Fprintf(l.out, "\tkubectl get pods -n <ecnet-ecnet-namespace> -l app=ecnet-bridge\n")
 
 	return nil

@@ -1,4 +1,4 @@
-package proxyserver
+package ctrlplane
 
 import (
 	"fmt"

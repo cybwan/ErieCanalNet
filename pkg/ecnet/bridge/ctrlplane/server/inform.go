@@ -4,11 +4,11 @@ import (
 	"sync"
 
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/announcements"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver"
 )
 
-func (s *Server) informTrafficPolicies(proxy *proxyserver.Proxy, wg *sync.WaitGroup) error {
+func (s *Server) informTrafficPolicies(proxy *ctrlplane.Proxy, wg *sync.WaitGroup) error {
 	// Subscribe to both broadcast and proxy UUID specific events
 	proxyUpdatePubSub := s.msgBroker.GetProxyUpdatePubSub()
 	proxyUpdateChan := proxyUpdatePubSub.Sub(announcements.ProxyUpdate.String(), messaging.GetPubSubTopicForProxyUUID(proxy.UUID.String()))

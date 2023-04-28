@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver"
 )
 
 // NewProxyRegistry initializes a new empty *ProxyRegistry.
@@ -17,11 +17,11 @@ func NewProxyRegistry(msgBroker *messaging.Broker) *ProxyRegistry {
 }
 
 // RegisterProxy registers a newly connected proxy.
-func (pr *ProxyRegistry) RegisterProxy() *proxyserver.Proxy {
+func (pr *ProxyRegistry) RegisterProxy() *ctrlplane.Proxy {
 	lock.Lock()
 	defer lock.Unlock()
 	if pr.cacheProxy == nil {
-		pr.cacheProxy = &proxyserver.Proxy{Mutex: new(sync.RWMutex)}
+		pr.cacheProxy = &ctrlplane.Proxy{Mutex: new(sync.RWMutex)}
 		pr.cacheProxy.UUID, _ = uuid.NewUUID()
 		pr.cacheProxy.Quit = make(chan bool)
 	}
@@ -29,7 +29,7 @@ func (pr *ProxyRegistry) RegisterProxy() *proxyserver.Proxy {
 }
 
 // GetConnectedProxy loads a connected proxy from the registry.
-func (pr *ProxyRegistry) GetConnectedProxy() *proxyserver.Proxy {
+func (pr *ProxyRegistry) GetConnectedProxy() *ctrlplane.Proxy {
 	lock.Lock()
 	defer lock.Unlock()
 	return pr.cacheProxy

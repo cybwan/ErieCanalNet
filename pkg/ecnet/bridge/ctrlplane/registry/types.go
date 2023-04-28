@@ -4,8 +4,8 @@ package registry
 import (
 	"sync"
 
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 // from the control plane.
 type ProxyRegistry struct {
 	msgBroker  *messaging.Broker
-	cacheProxy *proxyserver.Proxy
+	cacheProxy *ctrlplane.Proxy
 
 	// Fire a inform to update proxies
 	UpdateProxies func()

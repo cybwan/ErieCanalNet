@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/announcements"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane"
 )
 
 // Routine which fulfills listening to proxy broadcasts
@@ -59,8 +59,8 @@ func (s *Server) broadcastListener() {
 	}
 }
 
-func (s *Server) fireExistProxies() []*proxyserver.Proxy {
-	var allProxies []*proxyserver.Proxy
+func (s *Server) fireExistProxies() []*ctrlplane.Proxy {
+	var allProxies []*ctrlplane.Proxy
 	connectedProxy := s.proxyRegistry.GetConnectedProxy()
 	if connectedProxy == nil {
 		connectedProxy = s.proxyRegistry.RegisterProxy()
@@ -70,7 +70,7 @@ func (s *Server) fireExistProxies() []*proxyserver.Proxy {
 	return allProxies
 }
 
-func (s *Server) informProxy(proxy *proxyserver.Proxy) {
+func (s *Server) informProxy(proxy *ctrlplane.Proxy) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {

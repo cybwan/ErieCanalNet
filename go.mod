@@ -14,7 +14,7 @@ require (
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/jstemmer/go-junit-report v1.0.0
@@ -46,7 +46,7 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.6.0
+	golang.org/x/sys v0.6.0 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	honnef.co/go/tools v0.4.3 // indirect
 )
@@ -54,10 +54,8 @@ require (
 require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/cilium/ebpf v0.10.0
-	github.com/containernetworking/cni v1.1.2
-	github.com/florianl/go-tc v0.4.2
-	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/miekg/dns v1.1.53
 	github.com/pkg/errors v0.9.1
 	k8s.io/kubectl v0.26.0-alpha.1
 )
@@ -112,6 +110,7 @@ require (
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/firefart/nonamedreturns v1.0.4 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/go-critic/go-critic v0.7.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
@@ -163,7 +162,6 @@ require (
 	github.com/jirfag/go-printf-func-name v0.0.0-20200119135958-7558a9eaa5af // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/josharian/native v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/julz/importas v0.1.0 // indirect
 	github.com/junk1tm/musttag v0.5.0 // indirect
@@ -191,8 +189,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mbilski/exhaustivestruct v1.2.0 // indirect
-	github.com/mdlayher/netlink v1.6.0 // indirect
-	github.com/mdlayher/socket v0.1.1 // indirect
 	github.com/mgechev/revive v1.3.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

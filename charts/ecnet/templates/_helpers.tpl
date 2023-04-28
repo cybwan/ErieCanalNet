@@ -19,7 +19,7 @@ securityContext:
     supplementalGroups: [5555]
 {{- end -}}
 
-{{/* ecnet-controller image */}}
+{{/* ecnet-ctrlplane image */}}
 {{- define "ecnetController.image" -}}
 {{- printf "%s/%s:%s" .Values.ecnet.image.registry .Values.ecnet.image.name.ecnetController .Values.ecnet.image.tag -}}
 {{- end -}}

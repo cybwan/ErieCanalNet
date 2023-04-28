@@ -109,7 +109,7 @@ func (b *Broker) runProxyUpdateDispatcher(stopCh <-chan struct{}) {
 	// slides the window further ahead in time, up to a max of 'proxyUpdateMaxWindow'.
 	//
 	// This mechanism is necessary to avoid triggering proxy update pub-sub events in
-	// a hot loop, which would otherwise result in CPU spikes on the controller.
+	// a hot loop, which would otherwise result in CPU spikes on the ctrlplane.
 	// We want to coalesce as many proxy update events within the 'proxyUpdateMaxWindow'
 	// duration.
 	dispatchPending := false

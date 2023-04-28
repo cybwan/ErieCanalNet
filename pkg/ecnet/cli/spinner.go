@@ -82,8 +82,8 @@ func (s *Spinner) Init(clientSet kubernetes.Interface, ecnetNamespace string, va
 func (s *Spinner) done() bool {
 	if len(s.watchers) >= 3 {
 		doneApps := map[string]bool{
-			"ecnet-bootstrap":  false,
-			"ecnet-controller": false,
+			"ecnet-bootstrap": false,
+			"ecnet-ctrlplane": false,
 		}
 		for _, w := range s.watchers {
 			if !w.ready {
