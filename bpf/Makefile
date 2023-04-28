@@ -7,6 +7,7 @@ PROG_MOUNT_PATH=/sys/fs/bpf
 
 MACROS:=
 DEBUG ?= 1
+BRIDGE_ETH ?= cni0
 BRIDGE_IP ?= 183763201 #10.244.1.1
 
 # see https://stackoverflow.com/questions/15063298/how-to-check-kernel-version-in-makefile
@@ -94,10 +95,10 @@ load-dnsproxy: load-map-ecnet_dns_resdb load-map-ecnet_dns_endpt
 		map name ecnet_dns_endpt pinned $(PROG_MOUNT_PATH)/ecnet_dns_endpt
 
 attach-dnsproxy:
-	sudo ip link set dev cni0 xdpgeneric pinned $(PROG_MOUNT_PATH)/dnxproxy/xdp
+	sudo ip link set dev $(BRIDGE_ETH) xdpgeneric pinned $(PROG_MOUNT_PATH)/dnxproxy/xdp
 
 clean-dnsproxy:
-	sudo ip link set dev cni0 xdpgeneric off
+	sudo ip link set dev $(BRIDGE_ETH) xdpgeneric off
 	sudo rm -rf $(PROG_MOUNT_PATH)/dnxproxy
 
 load-connect: load-map-ecnet_sess_dest

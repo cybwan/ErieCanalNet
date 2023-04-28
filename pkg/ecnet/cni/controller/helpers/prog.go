@@ -7,20 +7,27 @@ import (
 )
 
 // LoadProgs load ebpf progs
-func LoadProgs(kernelTracing bool) error {
+func LoadProgs(kernelTracing bool, bridgeEth string) error {
 	if os.Getuid() != 0 {
 		return fmt.Errorf("root user in required for this process or container")
 	}
+
 	cmd := exec.Command("make", "load")
 	cmd.Env = os.Environ()
+
 	if !kernelTracing {
 		cmd.Env = append(cmd.Env, "DEBUG=0")
 	}
 
-	if _, bridgeIP := GetBridgeIP(); bridgeIP > 0 {
-		cmd.Env = append(cmd.Env, fmt.Sprintf("BRIDGE_IP=%d", bridgeIP))
+	if len(bridgeEth) > 0 {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("BRIDGE_ETH=%s", bridgeEth))
+		if _, bridgeIP := GetBridgeIP(bridgeEth); bridgeIP > 0 {
+			cmd.Env = append(cmd.Env, fmt.Sprintf("BRIDGE_IP=%d", bridgeIP))
+		} else {
+			return fmt.Errorf("unexpected exit err: retrieves cni bridge eth's ipv4 addr")
+		}
 	} else {
-		return fmt.Errorf("unexpected exit err: retrieves cni bridge veth's ipv4 addr")
+		return fmt.Errorf("unexpected exit err: retrieves cni bridge eth")
 	}
 
 	cmd.Stdout = os.Stdout

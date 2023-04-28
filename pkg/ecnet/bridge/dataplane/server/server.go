@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/cilium/ebpf/rlimit"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/controller/helpers"
@@ -19,12 +18,6 @@ const (
 	workerPoolSize = 0
 )
 
-var (
-	ecnetCodebase      = "ecnet/base"
-	ecnetProxyCodebase = "ecnet"
-	ecnetCodebaseRepo  = fmt.Sprintf("/%s", ecnetCodebase)
-)
-
 // NewBridgeServer creates a new bridge server
 func NewBridgeServer(meshCatalog catalog.MeshCataloger, ecnetNamespace string, cfg configurator.Configurator, kubecontroller k8s.Controller, msgBroker *messaging.Broker) *Server {
 	server := Server{
@@ -39,8 +32,8 @@ func NewBridgeServer(meshCatalog catalog.MeshCataloger, ecnetNamespace string, c
 }
 
 // Start starts the codebase push server
-func (s *Server) Start(kernelTracing bool) error {
-	if err := helpers.LoadProgs(kernelTracing); err != nil {
+func (s *Server) Start(kernelTracing bool, bridgeEth string) error {
+	if err := helpers.LoadProgs(kernelTracing, bridgeEth); err != nil {
 		log.Fatal().Msgf("failed to load ebpf programs: %v", err)
 	}
 	if err := rlimit.RemoveMemlock(); err != nil {

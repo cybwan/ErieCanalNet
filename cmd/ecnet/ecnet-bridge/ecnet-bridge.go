@@ -36,7 +36,6 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/cni/config"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/logger"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/version"
 )
@@ -50,6 +49,7 @@ var (
 	ecnetVersion        string
 	trustDomain         string
 	kernelTracing       bool
+	bridgeEth           string
 
 	scheme = runtime.NewScheme()
 )
@@ -72,7 +72,7 @@ func init() {
 
 	// Get some flags from commands
 	flags.BoolVarP(&kernelTracing, "kernel-tracing", "d", false, "kernel tracing mode")
-	flags.StringVar(&config.BridgeEth, "bridge-eth", "cni0", "bridge veth created by CNI")
+	flags.StringVar(&bridgeEth, "bridge-eth", "cni0", "bridge veth created by CNI")
 
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = admissionv1.AddToScheme(scheme)
@@ -147,7 +147,7 @@ func main() {
 	)
 
 	dataPlaneServer := server.NewBridgeServer(meshCatalog, ecnetNamespace, cfg, k8sClient, msgBroker)
-	if err = dataPlaneServer.Start(kernelTracing); err != nil {
+	if err = dataPlaneServer.Start(kernelTracing, bridgeEth); err != nil {
 		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing proxy control server")
 	}
 
