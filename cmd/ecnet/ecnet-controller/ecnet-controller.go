@@ -150,7 +150,7 @@ func main() {
 	proxyRegistry := registry.NewProxyRegistry(msgBroker)
 	ctrlPlaneServer := server.NewRepoServer(meshCatalog, proxyRegistry, ecnetNamespace, cfg, k8sClient, msgBroker)
 	if err = ctrlPlaneServer.Start(cfg.GetProxyServerPort()); err != nil {
-		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing proxy control server")
+		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing control plane server")
 	}
 
 	// Initialize ecnet's http service server
@@ -175,7 +175,7 @@ func main() {
 
 	<-stop
 	cancel()
-	log.Info().Msgf("Stopping ecnet-ctrlplane %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
+	log.Info().Msgf("Stopping ecnet-controller %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
 }
 
 func parseFlags() error {
@@ -198,7 +198,7 @@ func getECNETControllerPod(kubeClient kubernetes.Interface) (*corev1.Pod, error)
 	if err != nil {
 		// TODO(#3962): metric might not be scraped before process restart resulting from this error
 		log.Error().Err(err).Str(errcode.Kind, errcode.GetErrCodeWithMetric(errcode.ErrFetchingControllerPod)).
-			Msgf("Error retrieving ecnet-ctrlplane pod %s", podName)
+			Msgf("Error retrieving ecnet-controller pod %s", podName)
 		return nil, err
 	}
 

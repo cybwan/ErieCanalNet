@@ -148,7 +148,7 @@ func main() {
 
 	dataPlaneServer := server.NewBridgeServer(meshCatalog, ecnetNamespace, cfg, k8sClient, msgBroker)
 	if err = dataPlaneServer.Start(kernelTracing, bridgeEth); err != nil {
-		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing proxy control server")
+		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing data plane server")
 	}
 
 	// Initialize ecnet's http service server
@@ -172,31 +172,11 @@ func main() {
 	go k8s.WatchAndUpdateLogLevel(msgBroker, stop)
 
 	<-stop
+	if err = dataPlaneServer.Stop(); err != nil {
+		log.Error().Err(err).Msgf("Error stopping bridge server")
+	}
 	cancel()
 	log.Info().Msgf("Stopping ecnet-bridge %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
-
-	/*-----------------*/
-
-	//// Initialize kube config and client
-	//kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigFile)
-	//if err != nil {
-	//	log.Fatal().Err(err).Msgf("Error creating kube config (kubeconfig=%s)", kubeConfigFile)
-	//}
-	//kubeClient := kubernetes.NewForConfigOrDie(kubeConfig)
-	//
-	//if err = helpers.LoadProgs(config.KernelTracing); err != nil {
-	//	log.Fatal().Msgf("failed to load ebpf programs: %v", err)
-	//}
-	//
-	//if err = rlimit.RemoveMemlock(); err != nil {
-	//	log.Fatal().Msgf("remove memlock error: %v", err)
-	//}
-	//
-	//stop := make(chan struct{}, 1)
-	//if err = podwatcher.Run(kubeClient, stop); err != nil {
-	//	log.Fatal().Err(err)
-	//}
-	//log.Info().Msgf("Stopping ecnet-bridge %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
 }
 
 func parseFlags() error {
@@ -219,7 +199,7 @@ func getECNETBridgePod(kubeClient kubernetes.Interface) (*corev1.Pod, error) {
 	if err != nil {
 		// TODO(#3962): metric might not be scraped before process restart resulting from this error
 		log.Error().Err(err).Str(errcode.Kind, errcode.GetErrCodeWithMetric(errcode.ErrFetchingBridgePod)).
-			Msgf("Error retrieving ecnet-dataplane pod %s", podName)
+			Msgf("Error retrieving ecnet-bridge pod %s", podName)
 		return nil, err
 	}
 
