@@ -24,4 +24,5 @@ type Server struct {
 	kubeController k8s.Controller
 	msgBroker      *messaging.Broker
 	dnsEndpoints   map[string]string
+	dnsResolves    map[string]uint8
 }

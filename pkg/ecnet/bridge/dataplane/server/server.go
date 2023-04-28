@@ -31,6 +31,7 @@ func NewBridgeServer(meshCatalog catalog.MeshCataloger, ecnetNamespace string, c
 		kubeController: kubecontroller,
 		msgBroker:      msgBroker,
 		dnsEndpoints:   make(map[string]string),
+		dnsResolves:    make(map[string]uint8),
 	}
 	return &server
 }

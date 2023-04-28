@@ -27,6 +27,7 @@ func (job *BridgeNodeWatcherJob) Run() {
 
 	s := job.bridgeServer
 	syncDNSEndpoints(s.catalog, s.dnsEndpoints)
+	syncDNSResolves(s.catalog, s.dnsResolves)
 }
 
 // JobName implementation for this job, for logging purposes
@@ -80,5 +81,40 @@ func syncDNSEndpoints(mc catalog.MeshCataloger, dnsEndpointsMap map[string]strin
 		}
 	} else {
 		log.Error().Err(err)
+	}
+}
+
+func syncDNSResolves(mc catalog.MeshCataloger, dnsResolvesMap map[string]uint8) {
+	outboundTrafficPolicy := mc.GetOutboundMeshTrafficPolicy()
+	if len(outboundTrafficPolicy.HTTPRouteConfigsPerPort) == 0 {
+		return
+	}
+	latestResolvesMap := make(map[string]uint8)
+	for _, outboundTrafficPolicies := range outboundTrafficPolicy.HTTPRouteConfigsPerPort {
+		if len(outboundTrafficPolicies) == 0 {
+			continue
+		}
+		for _, outboundPolicy := range outboundTrafficPolicies {
+			if len(outboundPolicy.Hostnames) == 0 {
+				continue
+			}
+			for _, hostname := range outboundPolicy.Hostnames {
+				if strings.Contains(hostname, ":") {
+					continue
+				}
+				latestResolvesMap[hostname] = 0
+			}
+		}
+	}
+	for hostname := range latestResolvesMap {
+		if _, exist := dnsResolvesMap[hostname]; !exist {
+			helpers.UpdateDNSResolveEntry(hostname, 60)
+		}
+	}
+	for hostname := range dnsResolvesMap {
+		if _, exist := latestResolvesMap[hostname]; !exist {
+			delete(dnsResolvesMap, hostname)
+			helpers.DeleteDNSResolveEntry(hostname)
+		}
 	}
 }

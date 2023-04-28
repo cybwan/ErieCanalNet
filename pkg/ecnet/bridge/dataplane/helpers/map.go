@@ -68,35 +68,40 @@ func GetDNSEndpointMap() *ebpf.Map {
 	return dnsEndpointMap
 }
 
-func DoTest() {
-	ttl := uint32(60)
-	names := []string{
-		"pipy-ok.pipy.",
-		"pipy-ok.pipy.svc.",
-		"pipy-ok.pipy.svc.cluster.",
-		"pipy-ok.pipy.svc.cluster.local.",
-		"pipy-ok.pipy.cluster.",
-		"pipy-ok.pipy.cluster.local.",
-	}
+// UpdateDNSResolveEntry updates DNS Resolve Entry
+func UpdateDNSResolveEntry(name string, ttl uint32) {
 	qTypes := []uint16{dns.TypeA, dns.TypeAAAA}
-	for _, name := range names {
-		for _, qType := range qTypes {
-			k := DNSQuery{
-				QType:  qType,
-				QClass: dns.ClassINET,
-			}
-			dns.PackDomainName(name, k.Name[:], 0, nil, false)
-			v := AAAARecord{
-				Ttl: ttl,
-			}
-			binary.BigEndian.PutUint32(v.Addr[:], bridgeIPInt)
-			err := GetDNSResolveMap().Update(&k, &v, ebpf.UpdateAny)
-			if err != nil {
-				log.Error().Msgf("update ecnet_dns_resdb error: %v", err)
-			}
+	for _, qType := range qTypes {
+		k := DNSQuery{
+			QType:  qType,
+			QClass: dns.ClassINET,
+		}
+		dns.PackDomainName(fmt.Sprintf("%s.", name), k.Name[:], 0, nil, false)
+		v := AAAARecord{
+			Ttl: ttl,
+		}
+		binary.BigEndian.PutUint32(v.Addr[:], bridgeIPInt)
+		err := GetDNSResolveMap().Update(&k, &v, ebpf.UpdateAny)
+		if err != nil {
+			log.Error().Msgf("update ecnet_dns_resdb entry error: %v", err)
 		}
 	}
+}
 
+// DeleteDNSResolveEntry deletes DNS Resolve Entry
+func DeleteDNSResolveEntry(name string) {
+	qTypes := []uint16{dns.TypeA, dns.TypeAAAA}
+	for _, qType := range qTypes {
+		k := DNSQuery{
+			QType:  qType,
+			QClass: dns.ClassINET,
+		}
+		dns.PackDomainName(name, k.Name[:], 0, nil, false)
+		err := GetDNSResolveMap().Delete(&k)
+		if err != nil {
+			log.Error().Msgf("delete ecnet_dns_resdb entry error: %v", err)
+		}
+	}
 }
 
 // UpdateDNSEndpointEntry updates DNS Endpoint Entry
