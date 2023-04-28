@@ -72,7 +72,7 @@ type Spinner struct {
 }
 
 // Init instance of Spinner with the supplied options
-func (s *Spinner) Init(clientSet kubernetes.Interface, ecnetNamespace string, vals map[string]interface{}) {
+func (s *Spinner) Init(clientSet kubernetes.Interface, ecnetNamespace string, _ map[string]interface{}) {
 	s.clientSet = clientSet
 	s.ecnetNamespace = ecnetNamespace
 	s.quit = make(chan bool, 1)

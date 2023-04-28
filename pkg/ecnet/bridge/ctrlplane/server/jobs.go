@@ -45,7 +45,7 @@ func (job *PipyConfGeneratorJob) Run() {
 
 	features(s, proxy, pipyConf)
 	pluginSetV := plugin(s, pipyConf)
-	outbound(cataloger, s, pipyConf, proxy)
+	outbound(cataloger, s, pipyConf)
 	balance(pipyConf)
 	reorder(pipyConf)
 	job.publishSidecarConf(s.repoClient, proxy, pipyConf, pluginSetV)
@@ -67,7 +67,7 @@ func reorder(pipyConf *PipyConf) {
 	}
 }
 
-func outbound(cataloger catalog.MeshCataloger, s *Server, pipyConf *PipyConf, proxy *ctrlplane.Proxy) bool {
+func outbound(cataloger catalog.MeshCataloger, s *Server, pipyConf *PipyConf) bool {
 	outboundTrafficPolicy := cataloger.GetOutboundMeshTrafficPolicy()
 	if len(outboundTrafficPolicy.ServicesResolvableSet) > 0 {
 		pipyConf.DNSResolveDB = outboundTrafficPolicy.ServicesResolvableSet

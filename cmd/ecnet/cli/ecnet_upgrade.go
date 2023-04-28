@@ -18,13 +18,13 @@ This command upgrades an ECNET control plane by upgrading the
 underlying Helm release.
 `
 
-const cniUpgradeExample = `
+const ecnetUpgradeExample = `
 # Upgrade the ecnet with the default name in the ecnet-system namespace, setting
 # the image registry and tag to the defaults, and leaving all other values unchanged.
-ecnet cni upgrade --ecnet-namespace ecnet-system
+ecnet ecnet upgrade --ecnet-namespace ecnet-system
 `
 
-type cniUpgradeCmd struct {
+type ecnetUpgradeCmd struct {
 	out io.Writer
 
 	ecnetName string
@@ -33,8 +33,8 @@ type cniUpgradeCmd struct {
 	setOptions []string
 }
 
-func newCniUpgradeCmd(config *helm.Configuration, out io.Writer) *cobra.Command {
-	upg := &cniUpgradeCmd{
+func newEcnetUpgradeCmd(config *helm.Configuration, out io.Writer) *cobra.Command {
+	upg := &ecnetUpgradeCmd{
 		out: out,
 	}
 	var chartPath string
@@ -43,7 +43,7 @@ func newCniUpgradeCmd(config *helm.Configuration, out io.Writer) *cobra.Command 
 		Use:     "upgrade",
 		Short:   "upgrade ecnet control plane",
 		Long:    upgradeDesc,
-		Example: cniUpgradeExample,
+		Example: ecnetUpgradeExample,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			if chartPath != "" {
 				var err error
@@ -66,7 +66,7 @@ func newCniUpgradeCmd(config *helm.Configuration, out io.Writer) *cobra.Command 
 	return cmd
 }
 
-func (u *cniUpgradeCmd) run(config *helm.Configuration) error {
+func (u *ecnetUpgradeCmd) run(config *helm.Configuration) error {
 	if u.chart == nil {
 		var err error
 		u.chart, err = loader.LoadArchive(bytes.NewReader(chartTGZSource))
@@ -93,7 +93,7 @@ func (u *cniUpgradeCmd) run(config *helm.Configuration) error {
 	return nil
 }
 
-func (u *cniUpgradeCmd) resolveValues() (map[string]interface{}, error) {
+func (u *ecnetUpgradeCmd) resolveValues() (map[string]interface{}, error) {
 	vals := make(map[string]interface{})
 	for _, val := range u.setOptions {
 		if err := strvals.ParseInto(val, vals); err != nil {

@@ -188,6 +188,6 @@ func (ic *InformerCollection) List(informerKey InformerKey) []interface{} {
 }
 
 // IsMonitoredNamespace returns a boolean indicating if the namespace is among the list of monitored namespaces
-func (ic InformerCollection) IsMonitoredNamespace(namespace string) bool {
+func (ic InformerCollection) IsMonitoredNamespace(_ string) bool {
 	return true
 }

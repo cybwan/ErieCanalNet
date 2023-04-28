@@ -1,11 +1,12 @@
 package server
 
 import (
+	"net"
+	"strings"
+
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/dataplane/helpers"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service"
-	"net"
-	"strings"
 )
 
 // BridgeNodeWatcherJob is the job to generate pipy policy json

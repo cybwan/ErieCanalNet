@@ -11,10 +11,10 @@ import (
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/constants"
 )
 
-const cniListDescription = `
+const ecnetListDescription = `
 This command will list all the ecnet control planes running in a Kubernetes cluster and ctrlplane pods.`
 
-type cniListCmd struct {
+type ecnetListCmd struct {
 	out       io.Writer
 	config    *rest.Config
 	clientSet kubernetes.Interface
@@ -28,20 +28,20 @@ type ecnetInfo struct {
 	monitoredNamespaces []string
 }
 
-type cniInfo struct {
+type ecnetService struct {
 	name      string
 	namespace string
 }
 
-func newCniList(out io.Writer) *cobra.Command {
-	listCmd := &cniListCmd{
+func newEcentList(out io.Writer) *cobra.Command {
+	listCmd := &ecnetListCmd{
 		out: out,
 	}
 
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "list control planes in k8s cluster",
-		Long:  cniListDescription,
+		Long:  ecnetListDescription,
 		Args:  cobra.ExactArgs(0),
 		RunE: func(_ *cobra.Command, args []string) error {
 			config, err := settings.RESTClientGetter().ToRESTConfig()
@@ -64,7 +64,7 @@ func newCniList(out io.Writer) *cobra.Command {
 	return cmd
 }
 
-func (l *cniListCmd) run() error {
+func (l *ecnetListCmd) run() error {
 	ecnetInfoList, err := getEcnetInfoList(l.config, l.clientSet)
 	if err != nil {
 		fmt.Fprintf(l.out, "Unable to list ecnets within the cluster.\n")
@@ -79,7 +79,7 @@ func (l *cniListCmd) run() error {
 	fmt.Fprint(w, getPrettyPrintedEcnetInfoList(ecnetInfoList))
 	_ = w.Flush()
 
-	cniInfoList := getSupportedCniInfoForEcnetList(ecnetInfoList, l.clientSet, l.config, l.localPort)
+	cniInfoList := getSupportedInfoForEcnetList(ecnetInfoList)
 	fmt.Fprint(w, getPrettyPrintedCniInfoList(cniInfoList))
 	_ = w.Flush()
 

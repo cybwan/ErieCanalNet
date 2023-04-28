@@ -24,18 +24,18 @@ var (
 )
 
 const (
-	MaxDnsNameLength = 256
+	maxDNSNameLength = 256
 )
 
-type DNSQuery struct {
+type dnsQuery struct {
 	QType  uint16
 	QClass uint16
-	Name   [MaxDnsNameLength]byte
+	Name   [maxDNSNameLength]byte
 }
 
-type AAAARecord struct {
+type aRecord struct {
 	Addr [4]byte
-	Ttl  uint32
+	TTL  uint32
 }
 
 // InitLoadPinnedMap init, load and pinned maps
@@ -72,16 +72,20 @@ func GetDNSEndpointMap() *ebpf.Map {
 func UpdateDNSResolveEntry(name string, ttl uint32) {
 	qTypes := []uint16{dns.TypeA, dns.TypeAAAA}
 	for _, qType := range qTypes {
-		k := DNSQuery{
+		k := dnsQuery{
 			QType:  qType,
 			QClass: dns.ClassINET,
 		}
-		dns.PackDomainName(fmt.Sprintf("%s.", name), k.Name[:], 0, nil, false)
-		v := AAAARecord{
-			Ttl: ttl,
+		_, err := dns.PackDomainName(fmt.Sprintf("%s.", name), k.Name[:], 0, nil, false)
+		if err != nil {
+			log.Error().Msgf("update ecnet_dns_resdb entry error: %v", err)
+			continue
+		}
+		v := aRecord{
+			TTL: ttl,
 		}
 		binary.BigEndian.PutUint32(v.Addr[:], bridgeIPInt)
-		err := GetDNSResolveMap().Update(&k, &v, ebpf.UpdateAny)
+		err = GetDNSResolveMap().Update(&k, &v, ebpf.UpdateAny)
 		if err != nil {
 			log.Error().Msgf("update ecnet_dns_resdb entry error: %v", err)
 		}
@@ -92,12 +96,16 @@ func UpdateDNSResolveEntry(name string, ttl uint32) {
 func DeleteDNSResolveEntry(name string) {
 	qTypes := []uint16{dns.TypeA, dns.TypeAAAA}
 	for _, qType := range qTypes {
-		k := DNSQuery{
+		k := dnsQuery{
 			QType:  qType,
 			QClass: dns.ClassINET,
 		}
-		dns.PackDomainName(name, k.Name[:], 0, nil, false)
-		err := GetDNSResolveMap().Delete(&k)
+		_, err := dns.PackDomainName(name, k.Name[:], 0, nil, false)
+		if err != nil {
+			log.Error().Msgf("update ecnet_dns_resdb entry error: %v", err)
+			continue
+		}
+		err = GetDNSResolveMap().Delete(&k)
 		if err != nil {
 			log.Error().Msgf("delete ecnet_dns_resdb entry error: %v", err)
 		}

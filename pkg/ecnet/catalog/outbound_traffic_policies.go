@@ -2,6 +2,7 @@ package catalog
 
 import (
 	mapset "github.com/deckarep/golang-set"
+
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/constants"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/errcode"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s"
