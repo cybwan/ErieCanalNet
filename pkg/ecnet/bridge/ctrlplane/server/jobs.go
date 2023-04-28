@@ -49,8 +49,6 @@ func (job *PipyConfGeneratorJob) Run() {
 	balance(pipyConf)
 	reorder(pipyConf)
 	job.publishSidecarConf(s.repoClient, proxy, pipyConf, pluginSetV)
-
-	cataloger.DoTest()
 }
 
 func balance(pipyConf *PipyConf) {

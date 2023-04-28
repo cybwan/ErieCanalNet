@@ -46,6 +46,7 @@ func (s *Server) Start(kernelTracing bool, bridgeEth string) error {
 	if err := helpers.AttachProgs(); err != nil {
 		return fmt.Errorf("failed to attach ebpf programs: %v", err)
 	}
+	s.catalog.DoTest()
 	s.ready = true
 	return nil
 }
