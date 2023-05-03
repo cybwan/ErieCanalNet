@@ -87,7 +87,7 @@ func splitHostName(c Controller, host string) (svc string, subdomain string) {
 		subdomain = ""
 
 		if c == nil {
-			// no controller was passed in; default to non-heuristic behavior
+			// no ctrlplane was passed in; default to non-heuristic behavior
 			return
 		}
 

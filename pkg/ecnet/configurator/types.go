@@ -21,12 +21,12 @@ type Client struct {
 	ecnetConfigName string
 }
 
-// Configurator is the controller interface for K8s namespaces
+// Configurator is the ctrlplane interface for K8s namespaces
 type Configurator interface {
 	// GetEcnetConfig returns the EcnetConfig resource corresponding to the control plane
 	GetEcnetConfig() configv1alpha1.EcnetConfig
 
-	// GetEcnetNamespace returns the namespace in which ECNET controller pod resides
+	// GetEcnetNamespace returns the namespace in which ECNET ctrlplane pod resides
 	GetEcnetNamespace() string
 
 	// GetEcnetConfigJSON returns the EcnetConfig in pretty JSON (human readable)

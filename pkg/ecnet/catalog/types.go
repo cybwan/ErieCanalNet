@@ -34,7 +34,7 @@ type MeshCatalog struct {
 	multiclusterController multicluster.Controller
 }
 
-// MeshCataloger is the mechanism by which the Service Mesh controller discovers all sidecar proxies connected to the catalog.
+// MeshCataloger is the mechanism by which the Service Mesh ctrlplane discovers all sidecar proxies connected to the catalog.
 type MeshCataloger interface {
 	// ListOutboundServices list the services the given service identity is allowed to initiate outbound connections to
 	ListOutboundServices() []service.MeshService
@@ -43,7 +43,7 @@ type MeshCataloger interface {
 	// is allowed access the upstream service
 	ListUpstreamEndpointsForService(service.MeshService) []endpoint.Endpoint
 
-	// GetKubeController returns the kube controller instance handling the current cluster
+	// GetKubeController returns the kube ctrlplane instance handling the current cluster
 	GetKubeController() k8s.Controller
 
 	// GetOutboundMeshTrafficPolicy returns the outbound mesh traffic policy for the given downstream identity

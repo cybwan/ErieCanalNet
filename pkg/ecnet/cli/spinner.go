@@ -72,7 +72,7 @@ type Spinner struct {
 }
 
 // Init instance of Spinner with the supplied options
-func (s *Spinner) Init(clientSet kubernetes.Interface, ecnetNamespace string, vals map[string]interface{}) {
+func (s *Spinner) Init(clientSet kubernetes.Interface, ecnetNamespace string, _ map[string]interface{}) {
 	s.clientSet = clientSet
 	s.ecnetNamespace = ecnetNamespace
 	s.quit = make(chan bool, 1)
@@ -84,6 +84,7 @@ func (s *Spinner) done() bool {
 		doneApps := map[string]bool{
 			"ecnet-bootstrap":  false,
 			"ecnet-controller": false,
+			"ecnet-bridge":     false,
 		}
 		for _, w := range s.watchers {
 			if !w.ready {

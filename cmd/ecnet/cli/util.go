@@ -69,7 +69,7 @@ func getPrettyPrintedEcnetInfoList(ecnetInfoList []ecnetInfo) string {
 }
 
 // getEcnetInfoList returns a list of meshes (including the info of each mesh) within the cluster
-func getEcnetInfoList(restConfig *rest.Config, clientSet kubernetes.Interface) ([]ecnetInfo, error) {
+func getEcnetInfoList(_ *rest.Config, clientSet kubernetes.Interface) ([]ecnetInfo, error) {
 	var ecnetInfoList []ecnetInfo
 
 	ecnetControllerDeployments, err := getControllerDeployments(clientSet)
@@ -108,7 +108,7 @@ func getEcnetInfoList(restConfig *rest.Config, clientSet kubernetes.Interface) (
 	return ecnetInfoList, nil
 }
 
-// getControllerDeployments returns a list of Deployments corresponding to ecnet-controller
+// getControllerDeployments returns a list of Deployments corresponding to ecnet-ctrlplane
 func getControllerDeployments(clientSet kubernetes.Interface) (*appsv1.DeploymentList, error) {
 	deploymentsClient := clientSet.AppsV1().Deployments("") // Get deployments from all namespaces
 	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{constants.AppLabel: constants.ECNETControllerName}}
@@ -118,7 +118,7 @@ func getControllerDeployments(clientSet kubernetes.Interface) (*appsv1.Deploymen
 	return deploymentsClient.List(context.TODO(), listOptions)
 }
 
-// getControllerPods returns a list of ecnet-controller Pods in a specified namespace
+// getControllerPods returns a list of ecnet-ctrlplane Pods in a specified namespace
 func getControllerPods(clientSet kubernetes.Interface, namespace string) (*corev1.PodList, error) {
 	labelSelector := metav1.LabelSelector{MatchLabels: map[string]string{constants.AppLabel: constants.ECNETControllerName}}
 	podClient := clientSet.CoreV1().Pods(namespace)
@@ -130,10 +130,10 @@ func getControllerPods(clientSet kubernetes.Interface, namespace string) (*corev
 
 // getPrettyPrintedCniInfoList returns a pretty printed list
 // of meshes with supported smi versions
-func getPrettyPrintedCniInfoList(cniInfoList []cniInfo) string {
+func getPrettyPrintedCniInfoList(ecnetServiceList []ecnetService) string {
 	s := "\nECNET NAME\tECNET NAMESPACE\n"
 
-	for _, cni := range cniInfoList {
+	for _, cni := range ecnetServiceList {
 		m := fmt.Sprintf(
 			"%s\t%s\n",
 			cni.name,
@@ -145,13 +145,13 @@ func getPrettyPrintedCniInfoList(cniInfoList []cniInfo) string {
 	return s
 }
 
-// getSupportedCniInfoForEcnetList returns a cniInfo list showing
+// getSupportedInfoForEcnetList returns a ecnetService list showing
 // the supported smi versions for each ecnet mesh in the mesh list
-func getSupportedCniInfoForEcnetList(ecnetInfoList []ecnetInfo, clientSet kubernetes.Interface, config *rest.Config, localPort uint16) []cniInfo {
-	var cniInfoList []cniInfo
+func getSupportedInfoForEcnetList(ecnetInfoList []ecnetInfo) []ecnetService {
+	var cniInfoList []ecnetService
 
 	for _, ecnet := range ecnetInfoList {
-		cniInfoList = append(cniInfoList, cniInfo{
+		cniInfoList = append(cniInfoList, ecnetService{
 			name:      ecnet.name,
 			namespace: ecnet.namespace,
 		})

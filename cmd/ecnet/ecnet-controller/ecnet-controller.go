@@ -1,6 +1,6 @@
-// Package main implements the main entrypoint for ecnet-controller and utility routines to
-// bootstrap the various internal components of ecnet-controller.
-// ecnet-controller is the core control plane component in ECNET responsible for programming proxies.
+// Package main implements the main entrypoint for ecnet-ctrlplane and utility routines to
+// bootstrap the various internal components of ecnet-ctrlplane.
+// ecnet-ctrlplane is the core control plane component in ECNET responsible for programming proxies.
 package main
 
 import (
@@ -24,6 +24,8 @@ import (
 	configClientset "github.com/flomesh-io/ErieCanal/pkg/ecnet/gen/client/config/clientset/versioned"
 	multiclusterClientset "github.com/flomesh-io/ErieCanal/pkg/ecnet/gen/client/multicluster/clientset/versioned"
 
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane/registry"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/ctrlplane/server"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/constants"
@@ -35,8 +37,6 @@ import (
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/k8s/informers"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/logger"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/messaging"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver/registry"
-	"github.com/flomesh-io/ErieCanal/pkg/ecnet/proxyserver/server"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/endpoint"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service/multicluster"
@@ -59,15 +59,15 @@ var (
 )
 
 var (
-	flags = pflag.NewFlagSet(`ecnet-controller`, pflag.ExitOnError)
-	log   = logger.New("ecnet-controller/main")
+	flags = pflag.NewFlagSet(`ecnet-ctrlplane`, pflag.ExitOnError)
+	log   = logger.New("ecnet-ctrlplane/main")
 )
 
 func init() {
 	flags.StringVarP(&verbosity, "verbosity", "v", constants.DefaultECNETLogLevel, "Set boot log verbosity level")
 	flags.StringVar(&ecnetName, "ecnet-name", "", "ecnet name")
-	flags.StringVar(&ecnetNamespace, "ecnet-namespace", "", "ecnet controller's namespace")
-	flags.StringVar(&ecnetServiceAccount, "ecnet-service-account", "", "ecnet controller's service account")
+	flags.StringVar(&ecnetNamespace, "ecnet-namespace", "", "ecnet ctrlplane's namespace")
+	flags.StringVar(&ecnetServiceAccount, "ecnet-service-account", "", "ecnet ctrlplane's service account")
 	flags.StringVar(&ecnetConfigName, "ecnet-config-name", "ecnet-config", "Name of the ecnet Config")
 	flags.StringVar(&ecnetVersion, "ecnet-version", "", "Version of ecnet")
 
@@ -79,7 +79,7 @@ func init() {
 }
 
 func main() {
-	log.Info().Msgf("Starting ecnet-controller %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
+	log.Info().Msgf("Starting ecnet-ctrlplane %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
 	if err := parseFlags(); err != nil {
 		log.Fatal().Err(err).Str(errcode.Kind, errcode.ErrInvalidCLIArgument.String()).Msg("Error parsing cmd line arguments")
 	}
@@ -99,18 +99,18 @@ func main() {
 
 	k8s.SetTrustDomain(trustDomain)
 
-	// Initialize the generic Kubernetes event recorder and associate it with the ecnet-controller pod resource
+	// Initialize the generic Kubernetes event recorder and associate it with the ecnet-ctrlplane pod resource
 	controllerPod, err := getECNETControllerPod(kubeClient)
 	if err != nil {
-		log.Fatal().Msg("Error fetching ecnet-controller pod")
+		log.Fatal().Msg("Error fetching ecnet-ctrlplane pod")
 	}
 	eventRecorder := events.GenericEventRecorder()
-	if err := eventRecorder.Initialize(controllerPod, kubeClient, ecnetNamespace); err != nil {
+	if err = eventRecorder.Initialize(controllerPod, kubeClient, ecnetNamespace); err != nil {
 		log.Fatal().Msg("Error initializing generic event recorder")
 	}
 
 	// This ensures CLI parameters (and dependent values) are correct.
-	if err := validateCLIParams(); err != nil {
+	if err = validateCLIParams(); err != nil {
 		events.GenericEventRecorder().FatalEvent(err, events.InvalidCLIParameters, "Error validating CLI parameters")
 	}
 
@@ -131,15 +131,15 @@ func main() {
 	// This component will be watching resources in the config.flomesh.io API group
 	cfg := configurator.NewConfigurator(informerCollection, ecnetNamespace, ecnetConfigName, msgBroker)
 	k8sClient := k8s.NewKubernetesController(informerCollection, msgBroker)
-	multiclusterController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
+	mcController := multicluster.NewMultiClusterController(informerCollection, kubeClient, k8sClient, msgBroker)
 	kubeProvider := kube.NewClient(k8sClient, cfg)
-	multiclusterProvider := fsm.NewClient(multiclusterController, cfg)
-	endpointsProviders := []endpoint.Provider{kubeProvider, multiclusterProvider}
-	serviceProviders := []service.Provider{kubeProvider, multiclusterProvider}
+	mcProvider := fsm.NewClient(mcController, cfg)
+	endpointsProviders := []endpoint.Provider{kubeProvider, mcProvider}
+	serviceProviders := []service.Provider{kubeProvider, mcProvider}
 
 	meshCatalog := catalog.NewMeshCatalog(
 		k8sClient,
-		multiclusterController,
+		mcController,
 		stop,
 		cfg,
 		serviceProviders,
@@ -148,17 +148,15 @@ func main() {
 	)
 
 	proxyRegistry := registry.NewProxyRegistry(msgBroker)
-	// Create and start the pipy repo http service
-	repoServer := server.NewRepoServer(meshCatalog, proxyRegistry, ecnetNamespace, cfg, k8sClient, msgBroker)
-	// Create and start the proxy service
-	if err = repoServer.Start(cfg.GetProxyServerPort()); err != nil {
-		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing proxy control server")
+	ctrlPlaneServer := server.NewRepoServer(meshCatalog, proxyRegistry, ecnetNamespace, cfg, k8sClient, msgBroker)
+	if err = ctrlPlaneServer.Start(cfg.GetProxyServerPort()); err != nil {
+		events.GenericEventRecorder().FatalEvent(err, events.InitializationError, "Error initializing control plane server")
 	}
 
-	// Initialize ECNET's http service server
+	// Initialize ecnet's http service server
 	httpServer := httpserver.NewHTTPServer(constants.ECNETHTTPServerPort)
 	// Health/Liveness probes
-	funcProbes := []health.Probes{repoServer}
+	funcProbes := []health.Probes{ctrlPlaneServer}
 	httpServer.AddHandlers(map[string]http.Handler{
 		constants.ECNETControllerReadinessPath: health.ReadinessHandler(funcProbes, nil),
 		constants.ECNETControllerLivenessPath:  health.LivenessHandler(funcProbes, nil),
@@ -188,7 +186,7 @@ func parseFlags() error {
 	return nil
 }
 
-// getECNETControllerPod returns the ecnet-controller pod.
+// getECNETControllerPod returns the ecnet-ctrlplane pod.
 // The pod name is inferred from the 'CONTROLLER_POD_NAME' env variable which is set during deployment.
 func getECNETControllerPod(kubeClient kubernetes.Interface) (*corev1.Pod, error) {
 	podName := os.Getenv("CONTROLLER_POD_NAME")

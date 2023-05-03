@@ -110,7 +110,7 @@ func namespaceHasNoEcnet(clientset kubernetes.Interface, namespace string) func(
 			}).String(),
 		})
 		if err != nil {
-			return fmt.Errorf("listing ecnet-controller deployments in namespace %s: %w", namespace, err)
+			return fmt.Errorf("listing ecnet-ctrlplane deployments in namespace %s: %w", namespace, err)
 		}
 		var ecnetNames []string
 		for _, dep := range deps.Items {

@@ -332,7 +332,7 @@ func (d *uninstallCniCmd) findEcnet(ecnetInfoList []ecnetInfo) bool {
 func (d *uninstallCniCmd) printEcnets() error {
 	fmt.Fprintf(d.out, "List of ecnets present in the cluster:\n")
 
-	listCmd := &cniListCmd{
+	listCmd := &ecnetListCmd{
 		out:       d.out,
 		config:    d.config,
 		clientSet: d.clientSet,

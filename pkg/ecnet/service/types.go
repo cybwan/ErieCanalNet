@@ -1,4 +1,4 @@
-// Package service models an instance of a service managed by ECNET controller and utility routines associated with it.
+// Package service models an instance of a service managed by ECNET ctrlplane and utility routines associated with it.
 package service
 
 import (

@@ -8,11 +8,11 @@ const (
 	// DefaultECNETLogLevel is the default ECNET log level if none is specified
 	DefaultECNETLogLevel = "info"
 
-	// ECNETHTTPServerPort is the port on which ecnet-controller and ecnet-injector serve HTTP requests for metrics, health probes etc.
+	// ECNETHTTPServerPort is the port on which ecnet-ctrlplane and ecnet-injector serve HTTP requests for metrics, health probes etc.
 	ECNETHTTPServerPort = 9091
 
 	// ECNETControllerName is the name of the ECNET Controller (formerly ADS service).
-	ECNETControllerName = "ecnet-controller"
+	ECNETControllerName = "ecnet-ctrlplane"
 
 	// ECNETBootstrapName is the name of the ECNET Bootstrap.
 	ECNETBootstrapName = "ecnet-bootstrap"
@@ -88,13 +88,13 @@ const (
 
 // Control plane HTTP server paths
 const (
-	// ECNETControllerReadinessPath is the path at which ECNET controller serves readiness probes
+	// ECNETControllerReadinessPath is the path at which ECNET ctrlplane serves readiness probes
 	ECNETControllerReadinessPath = "/health/ready"
 
-	// ECNETControllerLivenessPath is the path at which ECNET controller serves liveness probes
+	// ECNETControllerLivenessPath is the path at which ECNET ctrlplane serves liveness probes
 	ECNETControllerLivenessPath = "/health/alive"
 
-	// VersionPath is the path at which ECNET controller serves version info
+	// VersionPath is the path at which ECNET ctrlplane serves version info
 	VersionPath = "/version"
 
 	// WebhookHealthPath is the path at which the webooks serve health probes

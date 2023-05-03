@@ -27,8 +27,6 @@
 #define __section(NAME) __attribute__((section(NAME), used))
 #endif
 
-#define PIN_GLOBAL_NS 2
-
 struct bpf_elf_map {
     __u32 type;
     __u32 size_key;
@@ -100,6 +98,9 @@ static long (*bpf_l3_csum_replace)(struct __sk_buff *skb, __u32 offset,
                                    __u64 from, __u64 to, __u64 size) = (void *)
     BPF_FUNC_l3_csum_replace;
 
+static int (*bpf_csum_diff)(void *from, int from_size, void *to, int to_size,
+                            int seed) = (void *)BPF_FUNC_csum_diff;
+
 static int (*bpf_skb_load_bytes)(void *ctx, int off, void *to,
                                  int len) = (void *)BPF_FUNC_skb_load_bytes;
 
@@ -149,28 +150,3 @@ static int (*bpf_xdp_adjust_tail)(void *ctx, int offset) = (void *)
 static const __u32 ip_zero = 0;
 // 127.0.0.1 (network order)
 static const __u32 localhost = 127 + (1 << 24);
-
-static inline __u32 get_ipv4(__u32 *ip) { return ip[3]; }
-
-static inline void set_ipv4(__u32 *dst, __u32 src)
-{
-    memset(dst, 0, sizeof(__u32) * 3);
-    dst[3] = src;
-}
-
-static const __u32 ip_zero6[4] = {0, 0, 0, 0};
-// ::1 (network order)
-static const __u32 localhost6[4] = {0, 0, 0, 1 << 24};
-
-static inline void set_ipv6(__u32 *dst, __u32 *src)
-{
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-}
-
-static inline int ipv6_equal(__u32 *a, __u32 *b)
-{
-    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
-}

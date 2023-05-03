@@ -51,7 +51,7 @@ const envHelp = `
 This command prints out all the environment information used by ECNET
 `
 
-func newEnvCmd(stdout io.Writer, stderr io.Writer) *cobra.Command {
+func newEnvCmd(_ io.Writer, stderr io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "env",
 		Short: "ecnet client environment information",
