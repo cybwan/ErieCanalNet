@@ -26,7 +26,6 @@ cp ./${system}-${arch}/ecnet /usr/local/bin/
 ```bash
 export ecnet_namespace=ecnet-system
 export ecnet_name=ecnet
-export dns_svc_ip="$(kubectl get svc -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].spec.clusterIP}')"
 ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
@@ -35,8 +34,6 @@ ecnet install \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
-    --set=ecnet.localDNSProxy.enable=true \
-    --set=ecnet.localDNSProxy.primaryUpstreamDNSServerIPAddr="${dns_svc_ip}" \
     --set=ecnet.ecnetBridge.cni.hostCniBridgeEth=cni0 \
     --timeout=900s
 ```
@@ -46,7 +43,6 @@ ecnet install \
 ```bash
 export ecnet_namespace=ecnet-system
 export ecnet_name=ecnet
-export dns_svc_ip="$(kubectl get svc -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].spec.clusterIP}')"
 ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
@@ -55,8 +51,6 @@ ecnet install \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
-    --set=ecnet.localDNSProxy.enable=true \
-    --set=ecnet.localDNSProxy.primaryUpstreamDNSServerIPAddr="${dns_svc_ip}" \
     --set=ecnet.ecnetBridge.cni.hostCniBridgeEth=tunl0 \
     --timeout=900s
 ```
@@ -66,7 +60,6 @@ ecnet install \
 ```bash
 export ecnet_namespace=ecnet-system
 export ecnet_name=ecnet
-export dns_svc_ip="$(kubectl get svc -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].spec.clusterIP}')"
 ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
@@ -75,8 +68,6 @@ ecnet install \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
-    --set=ecnet.localDNSProxy.enable=true \
-    --set=ecnet.localDNSProxy.primaryUpstreamDNSServerIPAddr="${dns_svc_ip}" \
     --set=ecnet.ecnetBridge.cni.hostCniBridgeEth=weave \
     --timeout=900s
 ```
@@ -196,17 +187,5 @@ content-length: 9593
 server: gunicorn/19.9.0
 access-control-allow-origin: *
 access-control-allow-credentials: true
-```
-
-
-
-
-
-```
-make compile-clean compile 
-make load-connect load-sendmsg load-recvmsg load-redirmsg load-sockops
-make attach-connect attach-sendmsg attach-recvmsg attach-redirmsg attach-sockops
-make clean-connect clean-sendmsg clean-recvmsg clean-redirmsg clean-sockops clean-maps
-curl -I pipy-ok.pipy:8080
 ```
 
