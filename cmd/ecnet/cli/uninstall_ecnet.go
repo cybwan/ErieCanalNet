@@ -47,7 +47,7 @@ func newUninstallCniCmd(config *action.Configuration, in io.Reader, out io.Write
 	}
 
 	cmd := &cobra.Command{
-		Use:   "cni",
+		Use:   "ecnet",
 		Short: "uninstall ecnet control plane instance",
 		Long:  uninstallEcnetDescription,
 		Args:  cobra.ExactArgs(0),
