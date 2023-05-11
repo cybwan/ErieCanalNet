@@ -1,6 +1,6 @@
 # Open Service Mesh Edge Helm Chart
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.1](https://img.shields.io/badge/AppVersion-v1.0.1-informational?style=flat-square)
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.0.2](https://img.shields.io/badge/AppVersion-v1.0.2-informational?style=flat-square)
 
 A Helm chart to install the [ecnet](https://github.com/flomesh-io/ErieCanal) control plane on Kubernetes.
 
@@ -77,7 +77,7 @@ The following table lists the configurable parameters of the ecnet chart and the
 | ecnet.ecnetBootstrap.replicaCount | int | `1` | ECNET bootstrap's replica count |
 | ecnet.ecnetBootstrap.resource | object | `{"limits":{"cpu":"0.5","memory":"128M"},"requests":{"cpu":"0.3","memory":"128M"}}` | ECNET bootstrap's container resource parameters |
 | ecnet.ecnetBootstrap.tolerations | list | `[]` | Node tolerations applied to control plane pods. The specified tolerations allow pods to schedule onto nodes with matching taints. |
-| ecnet.ecnetBridge | object | `{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]},{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}]}},"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["ecnet-controller"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"cni":{"hostCniBridgeEth":"cni0"},"kernelTracing":true,"kindMode":false,"resource":{"limits":{"cpu":"1.5","memory":"1G"},"requests":{"cpu":"0.5","memory":"256M"}},"tolerations":[]}` | ECNET bridge parameters |
+| ecnet.ecnetBridge | object | `{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]},{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}]}},"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["ecnet-controller"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"cni":{"hostCniBridgeEth":"cni0"},"kernelTracing":true,"resource":{"limits":{"cpu":"1.5","memory":"1G"},"requests":{"cpu":"0.5","memory":"256M"}},"tolerations":[]}` | ECNET bridge parameters |
 | ecnet.ecnetBridge.tolerations | list | `[]` | Node tolerations applied to control plane pods. The specified tolerations allow pods to schedule onto nodes with matching taints. |
 | ecnet.ecnetController | object | `{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]},{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}]}},"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["ecnet-controller"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"autoScale":{"cpu":{"targetAverageUtilization":80},"enable":false,"maxReplicas":5,"memory":{"targetAverageUtilization":80},"minReplicas":1},"podLabels":{},"replicaCount":1,"resource":{"limits":{"cpu":"1.5","memory":"1G"},"requests":{"cpu":"0.5","memory":"128M"}},"tolerations":[]}` | ECNET controller parameters |
 | ecnet.ecnetController.autoScale | object | `{"cpu":{"targetAverageUtilization":80},"enable":false,"maxReplicas":5,"memory":{"targetAverageUtilization":80},"minReplicas":1}` | Auto scale configuration |
@@ -92,7 +92,7 @@ The following table lists the configurable parameters of the ecnet chart and the
 | ecnet.ecnetName | string | `"ecnet"` | Identifier for the instance of an ecnet within a cluster |
 | ecnet.ecnetNamespace | string | `""` | Namespace to deploy ECNET in. If not specified, the Helm release namespace is used. |
 | ecnet.enforceSingleEcnet | bool | `true` | Enforce only deploying one ecnet in the cluster |
-| ecnet.image | object | `{"name":{"ecnetBootstrap":"ecnet-bootstrap","ecnetBridge":"ecnet-bridge","ecnetBridgeInit":"ecnet-bridge-init","ecnetCRDs":"ecnet-crds","ecnetController":"ecnet-controller","ecnetPreinstall":"ecnet-preinstall"},"pullPolicy":"IfNotPresent","registry":"flomesh","tag":"1.0.1"}` | ECNET control plane image parameters |
+| ecnet.image | object | `{"name":{"ecnetBootstrap":"ecnet-bootstrap","ecnetBridge":"ecnet-bridge","ecnetBridgeInit":"ecnet-bridge-init","ecnetCRDs":"ecnet-crds","ecnetController":"ecnet-controller","ecnetPreinstall":"ecnet-preinstall"},"pullPolicy":"IfNotPresent","registry":"flomesh","tag":"1.0.2"}` | ECNET control plane image parameters |
 | ecnet.image.name | object | `{"ecnetBootstrap":"ecnet-bootstrap","ecnetBridge":"ecnet-bridge","ecnetBridgeInit":"ecnet-bridge-init","ecnetCRDs":"ecnet-crds","ecnetController":"ecnet-controller","ecnetPreinstall":"ecnet-preinstall"}` | Image name defaults |
 | ecnet.image.name.ecnetBootstrap | string | `"ecnet-bootstrap"` | ecnet-bootstrap's image name |
 | ecnet.image.name.ecnetBridge | string | `"ecnet-bridge"` | ecnet-bridge's image name |
@@ -102,7 +102,7 @@ The following table lists the configurable parameters of the ecnet chart and the
 | ecnet.image.name.ecnetPreinstall | string | `"ecnet-preinstall"` | ecnet-preinstall's image name |
 | ecnet.image.pullPolicy | string | `"IfNotPresent"` | Container image pull policy for control plane containers |
 | ecnet.image.registry | string | `"flomesh"` | Container image registry for control plane images |
-| ecnet.image.tag | string | `"1.0.1"` | Container image tag for control plane images |
+| ecnet.image.tag | string | `"1.0.2"` | Container image tag for control plane images |
 | ecnet.imagePullSecrets | list | `[]` | `ecnet-controller` image pull secret |
 | ecnet.localDNSProxy | object | `{"enable":true}` | Local DNS Proxy improves the performance of your computer by caching the responses coming from your DNS servers |
 | ecnet.pluginChains.inbound-http[0].plugin | string | `"modules/inbound-tls-termination"` |  |
@@ -157,12 +157,12 @@ The following table lists the configurable parameters of the ecnet chart and the
 | ecnet.pluginChains.outbound-tcp[2].priority | int | `100` |  |
 | ecnet.preinstall | object | `{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]},{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64"]}]}]}}},"nodeSelector":{},"tolerations":[]}` | ECNET's preinstall hook parameters |
 | ecnet.preinstall.tolerations | list | `[]` | Node tolerations applied to control plane pods. The specified tolerations allow pods to schedule onto nodes with matching taints. |
-| ecnet.proxyImage | string | `"flomesh/pipy-nightly:latest"` | Proxy image for Linux node workloads |
+| ecnet.proxyImage | string | `"flomesh/pipy:0.90.1-30"` | Proxy image for Linux node workloads |
 | ecnet.proxyLogLevel | string | `"error"` | Log level for the proxy. Non developers should generally never set this value. In production environments the LogLevel should be set to `error` |
 | ecnet.proxyServerPort | int | `6060` | Remote destination port on which the Discovery Service listens for new connections from Sidecars. |
-| ecnet.repoServer | object | `{"codebase":"","image":"flomesh/pipy-repo:0.90.0-54","ipaddr":"127.0.0.1","standalone":false}` | Pipy RepoServer |
+| ecnet.repoServer | object | `{"codebase":"","image":"flomesh/pipy-repo:0.90.1-30","ipaddr":"127.0.0.1","standalone":false}` | Pipy RepoServer |
 | ecnet.repoServer.codebase | string | `""` | codebase is the folder used by ecnetController. |
-| ecnet.repoServer.image | string | `"flomesh/pipy-repo:0.90.0-54"` | Image used for Pipy RepoServer |
+| ecnet.repoServer.image | string | `"flomesh/pipy-repo:0.90.1-30"` | Image used for Pipy RepoServer |
 | ecnet.repoServer.ipaddr | string | `"127.0.0.1"` | ipaddr of host/service where Pipy RepoServer is installed |
 | ecnet.repoServer.standalone | bool | `false` | if false , Pipy RepoServer is installed within ecnetController pod. |
 | ecnet.trustDomain | string | `"cluster.local"` | The trust domain to use as part of the common name when requesting new certificates. |
