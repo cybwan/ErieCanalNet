@@ -24,7 +24,10 @@ type EcnetConfig struct {
 
 // EcnetConfigSpec is the spec for ECNET's configuration.
 type EcnetConfigSpec struct {
-	// Sidecar defines the configurations of the proxy sidecar in a mesh.
+	// DNS defines the configurations of the dns service.
+	DNS DNSSpec `json:"dns,omitempty"`
+
+	// Sidecar defines the configurations of the proxy sidecar.
 	Sidecar SidecarSpec `json:"sidecar,omitempty"`
 
 	// RepoServer defines the configurations of pipy repo server.
@@ -34,16 +37,19 @@ type EcnetConfigSpec struct {
 	PluginChains PluginChainsSpec `json:"pluginChains,omitempty"`
 }
 
-// LocalDNSProxy is the type to represent ECNET's local DNS proxy configuration.
-type LocalDNSProxy struct {
-	// Enable defines a boolean indicating if the sidecars are enabled for local DNS Proxy.
-	Enable bool `json:"enable"`
+// DNSSpec is the type used to represent the specifications for dns service.
+type DNSSpec struct {
+	// Namespace of dns service
+	Namespace string `json:"namespace"`
 
-	// PrimaryUpstreamDNSServerIPAddr defines a primary upstream DNS server for local DNS Proxy.
-	PrimaryUpstreamDNSServerIPAddr string `json:"primaryUpstreamDNSServerIPAddr,omitempty"`
+	// Name of dns service
+	Name string `json:"name"`
 
-	// SecondaryUpstreamDNSServerIPAddr defines a secondary upstream DNS server for local DNS Proxy.
-	SecondaryUpstreamDNSServerIPAddr string `json:"secondaryUpstreamDNSServerIPAddr,omitempty"`
+	// Port of dns service
+	Port uint16 `json:"port"`
+
+	// Protocol of dns service
+	Protocol string `json:"protocol"`
 }
 
 // SidecarSpec is the type used to represent the specifications for the proxy sidecar.
@@ -56,9 +62,6 @@ type SidecarSpec struct {
 
 	// ConfigResyncInterval defines the resync interval for regular proxy broadcast updates.
 	ConfigResyncInterval string `json:"configResyncInterval,omitempty"`
-
-	// LocalDNSProxy improves the performance of your computer by caching the responses coming from your DNS servers
-	LocalDNSProxy LocalDNSProxy `json:"localDNSProxy,omitempty"`
 }
 
 // TracingSpec is the type to represent ECNET's tracing configuration.

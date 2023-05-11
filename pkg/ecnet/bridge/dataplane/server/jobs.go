@@ -6,6 +6,7 @@ import (
 
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/bridge/dataplane/helpers"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/catalog"
+	"github.com/flomesh-io/ErieCanal/pkg/ecnet/configurator"
 	"github.com/flomesh-io/ErieCanal/pkg/ecnet/service"
 )
 
@@ -27,7 +28,7 @@ func (job *BridgeNodeWatcherJob) Run() {
 	defer close(job.done)
 
 	s := job.bridgeServer
-	syncDNSEndpoints(s.catalog, s.dnsEndpoints)
+	syncDNSEndpoints(s.catalog, s.cfg, s.dnsEndpoints)
 	syncDNSResolves(s.catalog, s.dnsResolves)
 }
 
@@ -36,12 +37,12 @@ func (job *BridgeNodeWatcherJob) JobName() string {
 	return "bridgeJob"
 }
 
-func syncDNSEndpoints(mc catalog.MeshCataloger, dnsEndpointsMap map[string]string) {
+func syncDNSEndpoints(mc catalog.MeshCataloger, cfg configurator.Configurator, dnsEndpointsMap map[string]string) {
 	dnsSvc := service.MeshService{
-		Namespace: "kube-system",
-		Name:      "kube-dns",
-		Port:      53,
-		Protocol:  "udp",
+		Namespace: cfg.GetEcnetConfig().Spec.DNS.Namespace,
+		Name:      cfg.GetEcnetConfig().Spec.DNS.Name,
+		Port:      cfg.GetEcnetConfig().Spec.DNS.Port,
+		Protocol:  cfg.GetEcnetConfig().Spec.DNS.Protocol,
 	}
 	kubeController := mc.GetKubeController()
 	svc := kubeController.GetService(dnsSvc)

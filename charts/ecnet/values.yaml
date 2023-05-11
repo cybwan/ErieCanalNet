@@ -37,6 +37,12 @@ ecnet:
   # -- Curl image for control plane init container
   curlImage: curlimages/curl
 
+  dns:
+    namespace: kube-system
+    name: kube-dns
+    port: 53
+    protocol: udp
+
   # -- Pipy RepoServer
   repoServer:
     # -- Image used for Pipy RepoServer
@@ -166,10 +172,6 @@ ecnet:
 
   # -- Identifier for the instance of an ecnet within a cluster
   ecnetName: ecnet
-
-  # -- Local DNS Proxy improves the performance of your computer by caching the responses coming from your DNS servers
-  localDNSProxy:
-    enable: true
 
   # -- Sets the resync interval for regular proxy broadcast updates, set to 0s to not enforce any resync
   configResyncInterval: "90s"

@@ -42,21 +42,6 @@ func (c *Client) GetEcnetConfigJSON() (string, error) {
 	return cm, nil
 }
 
-// LocalDNSProxyEnabled returns whether local DNS proxy is enabled
-func (c *Client) LocalDNSProxyEnabled() bool {
-	return c.getEcnetConfig().Spec.Sidecar.LocalDNSProxy.Enable
-}
-
-// GetLocalDNSProxyPrimaryUpstream returns the primary upstream DNS server for local DNS Proxy
-func (c *Client) GetLocalDNSProxyPrimaryUpstream() string {
-	return c.getEcnetConfig().Spec.Sidecar.LocalDNSProxy.PrimaryUpstreamDNSServerIPAddr
-}
-
-// GetLocalDNSProxySecondaryUpstream returns the secondary upstream DNS server for local DNS Proxy
-func (c *Client) GetLocalDNSProxySecondaryUpstream() string {
-	return c.getEcnetConfig().Spec.Sidecar.LocalDNSProxy.SecondaryUpstreamDNSServerIPAddr
-}
-
 // GetSidecarLogLevel returns the sidecar log level
 func (c *Client) GetSidecarLogLevel() string {
 	logLevel := c.getEcnetConfig().Spec.Sidecar.LogLevel

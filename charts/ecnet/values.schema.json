@@ -165,6 +165,7 @@
             "description": "The top level required key in the values file.",
             "required": [
                 "image",
+                "dns",
                 "proxyServerPort",
                 "pluginChains",
                 "curlImage",
@@ -177,6 +178,52 @@
                 "ecnetBootstrap"
             ],
             "properties": {
+                "dns": {
+                    "$id": "#/properties/ecnet/properties/ecnetBridge/properties/dns",
+                    "type": "object",
+                    "title": "The DNS schema",
+                    "description": "The details of DNS.",
+                    "required": [
+                        "namespace",
+                        "name",
+                        "port",
+                        "protocol"
+                    ],
+                    "properties": {
+                        "namespace": {
+                            "$id": "#/properties/ecnet/properties/ecnetBridge/properties/dns/namespace",
+                            "type": "string",
+                            "title": "The namespace schema",
+                            "description": "Namespace of dns service",
+                            "default": {}
+                        },
+                        "name": {
+                            "$id": "#/properties/ecnet/properties/ecnetBridge/properties/dns/name",
+                            "type": "string",
+                            "title": "The name schema",
+                            "description": "Name of dns service",
+                            "default": {}
+                        },
+                        "port": {
+                            "$id": "#/properties/ecnet/properties/ecnetBridge/properties/dns/port",
+                            "type": "integer",
+                            "title": "The port schema",
+                            "description": "Port of dns service",
+                            "minimum": 1,
+                            "maximum": 65535,
+                            "examples": [
+                                53
+                            ]
+                        },
+                        "protocol": {
+                            "$id": "#/properties/ecnet/properties/ecnetBridge/properties/dns/protocol",
+                            "type": "string",
+                            "title": "The protocol schema",
+                            "description": "Protocol of dns service",
+                            "default": {}
+                        }
+                    }
+                },
                 "ecnetController": {
                     "$id": "#/properties/ecnet/properties/ecnetController",
                     "type": "object",
@@ -633,44 +680,6 @@
                     "examples": [
                         "error"
                     ]
-                },
-                "localDNSProxy": {
-                    "$id": "#/properties/ecnet/properties/localDNSProxy",
-                    "type": "object",
-                    "title": "The local DNS Proxy schema",
-                    "description": "Local DNS Proxy improves the performance of your computer by caching the responses coming from your DNS servers.",
-                    "examples": [
-                        {
-                            "enable": true
-                        }
-                    ],
-                    "required": [
-                        "enable"
-                    ],
-                    "properties": {
-                        "enable": {
-                            "$id": "#/properties/ecnet/properties/localDNSProxy/properties/enable",
-                            "type": "boolean",
-                            "title": "The enable schema for local DNS Proxy",
-                            "description": "Indicates whether local DNS Proxy is enabled or not",
-                            "examples": [
-                                true
-                            ]
-                        },
-                        "primaryUpstreamDNSServerIPAddr": {
-                            "$id": "#/properties/ecnet/properties/localDNSProxy/properties/primaryUpstreamDNSServerIPAddr",
-                            "type": "string",
-                            "title": "Primary upstream DNS server for local DNS Proxy",
-                            "description": "Primary upstream DNS server for local DNS Proxy"
-                        },
-                        "secondaryUpstreamDNSServerIPAddr": {
-                            "$id": "#/properties/ecnet/properties/localDNSProxy/properties/secondaryUpstreamDNSServerIPAddr",
-                            "type": "string",
-                            "title": "Secondary upstream DNS server for local DNS Proxy",
-                            "description": "Secondary upstream DNS server for local DNS Proxy"
-                        }
-                    },
-                    "additionalProperties": false
                 },
                 "controllerLogLevel": {
                     "$id": "#/properties/ecnet/properties/controllerLogLevel",

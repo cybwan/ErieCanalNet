@@ -145,20 +145,6 @@ type HTTPHostPort2Service map[HTTPHostPort]HTTPRouteRuleName
 // AllowedEndpoints is a wrapper type of map[Address]ServiceName
 type AllowedEndpoints map[Address]ServiceName
 
-// UpstreamDNSServers defines upstream DNS servers for local DNS Proxy.
-type UpstreamDNSServers struct {
-	// Primary defines a primary upstream DNS server for local DNS Proxy.
-	Primary *string `json:"Primary,omitempty"`
-	// Secondary defines a secondary upstream DNS server for local DNS Proxy.
-	Secondary *string `json:"Secondary,omitempty"`
-}
-
-// LocalDNSProxy is the type to represent ECNET's local DNS proxy configuration.
-type LocalDNSProxy struct {
-	// UpstreamDNSServers defines upstream DNS servers for local DNS Proxy.
-	UpstreamDNSServers *UpstreamDNSServers `json:"UpstreamDNSServers,omitempty"`
-}
-
 // EcnetConfigSpec represents the spec of mesh config
 type EcnetConfigSpec struct {
 	SidecarLogLevel string
@@ -167,7 +153,6 @@ type EcnetConfigSpec struct {
 		LivenessProbes  []v1.Probe `json:"LivenessProbes,omitempty"`
 		StartupProbes   []v1.Probe `json:"StartupProbes,omitempty"`
 	}
-	LocalDNSProxy *LocalDNSProxy `json:"LocalDNSProxy,omitempty"`
 }
 
 // WeightedCluster is a struct of a cluster and is weight that is backing a service

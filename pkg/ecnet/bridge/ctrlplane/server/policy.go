@@ -22,23 +22,6 @@ func (p *PipyConf) setSidecarLogLevel(sidecarLogLevel string) (update bool) {
 	return
 }
 
-func (p *PipyConf) setLocalDNSProxy(enable bool, primary, secondary string) {
-	if enable {
-		p.Spec.LocalDNSProxy = new(LocalDNSProxy)
-		if len(primary) > 0 || len(secondary) > 0 {
-			p.Spec.LocalDNSProxy.UpstreamDNSServers = new(UpstreamDNSServers)
-			if len(primary) > 0 {
-				p.Spec.LocalDNSProxy.UpstreamDNSServers.Primary = &primary
-			}
-			if len(secondary) > 0 {
-				p.Spec.LocalDNSProxy.UpstreamDNSServers.Secondary = &secondary
-			}
-		}
-	} else {
-		p.Spec.LocalDNSProxy = nil
-	}
-}
-
 func (p *PipyConf) newOutboundTrafficPolicy() *OutboundTrafficPolicy {
 	if p.Outbound == nil {
 		p.Outbound = new(OutboundTrafficPolicy)

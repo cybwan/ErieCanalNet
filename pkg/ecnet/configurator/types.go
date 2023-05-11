@@ -32,15 +32,6 @@ type Configurator interface {
 	// GetEcnetConfigJSON returns the EcnetConfig in pretty JSON (human readable)
 	GetEcnetConfigJSON() (string, error)
 
-	// LocalDNSProxyEnabled returns whether local DNS proxy is enabled
-	LocalDNSProxyEnabled() bool
-
-	// GetLocalDNSProxyPrimaryUpstream returns the primary upstream DNS server for local DNS Proxy
-	GetLocalDNSProxyPrimaryUpstream() string
-
-	// GetLocalDNSProxySecondaryUpstream returns the secondary upstream DNS server for local DNS Proxy
-	GetLocalDNSProxySecondaryUpstream() string
-
 	// GetSidecarLogLevel returns the sidecar log level
 	GetSidecarLogLevel() string
 

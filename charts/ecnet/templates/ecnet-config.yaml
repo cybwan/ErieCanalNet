@@ -6,11 +6,16 @@ metadata:
 data:
   preset-ecnet-config.json: |
     {
+      "dns": {
+        "namespace": {{.Values.ecnet.dns.namespace | mustToJson}},
+        "name": {{.Values.ecnet.dns.name | mustToJson}},
+        "port": {{.Values.ecnet.dns.port | mustToJson}},
+        "protocol": {{.Values.ecnet.dns.protocol | mustToJson}}
+      },
       "sidecar": {
         "logLevel": {{.Values.ecnet.proxyLogLevel | mustToJson}},
         "configResyncInterval": {{.Values.ecnet.configResyncInterval | mustToJson}},
-        "proxyServerPort": {{.Values.ecnet.proxyServerPort | mustToJson}},
-        "localDNSProxy": {{.Values.ecnet.localDNSProxy | mustToJson}}
+        "proxyServerPort": {{.Values.ecnet.proxyServerPort | mustToJson}}
       },
       "repoServer": {
         "ipaddr": {{.Values.ecnet.repoServer.ipaddr | mustToJson}},
