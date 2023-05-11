@@ -55,7 +55,7 @@ require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/cilium/ebpf v0.10.0
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/miekg/dns v1.1.53
+	github.com/miekg/dns v1.1.54
 	github.com/pkg/errors v0.9.1
 	k8s.io/kubectl v0.26.0-alpha.1
 )
