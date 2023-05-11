@@ -109,6 +109,7 @@ func syncDNSResolves(mc catalog.MeshCataloger, dnsResolvesMap map[string]uint8) 
 	}
 	for hostname := range latestResolvesMap {
 		if _, exist := dnsResolvesMap[hostname]; !exist {
+			dnsResolvesMap[hostname] = 1
 			helpers.UpdateDNSResolveEntry(hostname, 60)
 		}
 	}
