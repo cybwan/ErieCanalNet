@@ -117,7 +117,6 @@ spec:
         image: curlimages/curl
         imagePullPolicy: Always
         command: ["/bin/sleep", "infinity"]
-      nodeName: node2
 EOF
 
 kubectl wait --for=condition=ready pod -n demo -l app=sleep --timeout=180s
