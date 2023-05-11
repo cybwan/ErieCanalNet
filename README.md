@@ -30,7 +30,7 @@ ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
     --set=ecnet.image.registry=cybwan \
-    --set=ecnet.image.tag=1.0.1 \
+    --set=ecnet.image.tag=1.0.2 \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
@@ -47,7 +47,7 @@ ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
     --set=ecnet.image.registry=cybwan \
-    --set=ecnet.image.tag=1.0.1 \
+    --set=ecnet.image.tag=1.0.2 \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
@@ -64,7 +64,7 @@ ecnet install \
     --ecnet-name "$ecnet_name" \
     --ecnet-namespace "$ecnet_namespace" \
     --set=ecnet.image.registry=cybwan \
-    --set=ecnet.image.tag=1.0.1 \
+    --set=ecnet.image.tag=1.0.2 \
     --set=ecnet.image.pullPolicy=Always \
     --set=ecnet.proxyLogLevel=debug \
     --set=ecnet.controllerLogLevel=warn \
